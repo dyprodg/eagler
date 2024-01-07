@@ -33,14 +33,8 @@ const Timeline = () => {
     //component that shows logout button and active user data
     return (
         <div>
-            <Image 
-                className="m-5"
-                src='/eagler.svg'
-                alt="Logo"
-                width={50}
-                height={50}
-            />
-            <div className="max-w-[90%] md:mx-32 mx-12">
+            
+            <div className="max-w-[90%] md:mx-32 ml-12">
                 <div className="flex w-full h-screen flex-col">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
                     {fakePosts.map(post => (

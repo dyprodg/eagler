@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Nav from './nav';
 import { AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Header() {
 
@@ -16,9 +17,16 @@ export default function Header() {
 
   return (
     <>
-    <div className={styles.main}>
-
+    <div className='border'>
+   
       <div className={styles.header}>
+      <Image
+                className="m-5 hidden md:flex"
+                src='/eagler.svg'
+                alt="Logo"
+                width={50}
+                height={50}
+            />
         <div onClick={() => {setIsActive(!isActive)}} className={`${styles.button}`}>
           <div className={`${styles.burger} ${isActive ? styles.burgerActive : ""}`}></div>
         </div>
