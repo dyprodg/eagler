@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import RegisterButton from "./components/RegisterButton";
+import Image from "next/image";
 
 // Define an async function named 'Register'
 export default async function Register() {
@@ -15,13 +16,19 @@ export default async function Register() {
   // Render the registration page with components
   return (
     <div className="relative">
-      <div className="fixed top-0 right-0">
+      <div className="fixed w-full flex justify-between items-center">
         {/* Render the 'RegisterButton' component */}
+        <Image
+                className="m-5 hidden md:flex"
+                src='/eagler.svg'
+                alt="Logo"
+                width={50}
+                height={50}
+                priority
+            />
         <RegisterButton />
       </div>
       <div className="fixed top-0 left-0">
-        {/* Placeholder for a logo */}
-        <div>Logo</div>
       </div>
       <div>
         {/* Render the 'LoginForm' component */}
