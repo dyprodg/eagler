@@ -2,7 +2,7 @@
 
 
 import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useEffect} from 'react';
 import { Post } from "@/app/components/Post";
 import Image from "next/image";
@@ -11,6 +11,14 @@ import Image from "next/image";
 const Timeline = () => {
     const router = useRouter(); 
     const { data: session } = useSession();
+    useEffect(() => {
+        if (!session) {
+            redirect('/');
+        }
+    }, [session, router]);
+    if (!session) {
+        return null; 
+    }
 
     const fakePosts = Array.from({ length: 30 }, (_, index) => ({
         id: index,
@@ -21,15 +29,7 @@ const Timeline = () => {
 
       
     //useEffect for redirection in case no user is logged in
-    useEffect(() => {
-        if (!session) {
-            router.push('/');
-        }
-    }, [session, router]);
-    if (!session) {
-        return null; 
-    }
- 
+
     //component that shows logout button and active user data
     return (
         <div>

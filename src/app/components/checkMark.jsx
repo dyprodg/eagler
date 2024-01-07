@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-const checkMark = () => {
+const CheckMark = () => {
   return (
     <div className='mt-8 m-8 flex flex-col items-center justify-center'>
         {/* SVG element for rendering a checkmark */}
@@ -16,4 +16,4 @@ const checkMark = () => {
 }
 
 // Export the checkMark component
-export default checkMark;
+export default CheckMark;
