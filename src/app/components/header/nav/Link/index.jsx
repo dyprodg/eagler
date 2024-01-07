@@ -10,7 +10,7 @@ export default function Index({data, isActive, setSelectedIndicator}) {
     return (
       <motion.div className={styles.link} onMouseEnter={() => {setSelectedIndicator(href)}} custom={index} variants={slide} initial="initial" animate="enter" exit="exit">
         <motion.div variants={scale} animate={isActive ? "open" : "closed"} className={styles.indicator}></motion.div>
-        <Link href={href}>{title}</Link>
+        <Link href={href} className='hover:scale-105 transition ease-in-out'>{title}</Link>
       </motion.div>
     )
   }
