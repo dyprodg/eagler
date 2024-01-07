@@ -26,6 +26,7 @@ export default function Header() {
                 alt="Logo"
                 width={50}
                 height={50}
+                priority
             />
         <div onClick={() => {setIsActive(!isActive)}} className={`${styles.button}`}>
           <div className={`${styles.burger} ${isActive ? styles.burgerActive : ""}`}></div>

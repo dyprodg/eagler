@@ -21,7 +21,6 @@ const DeleteAccountPage = () => {
     //unauthorized redirect
     useEffect(() => {
         if (status === "unauthenticated") {
-            console.log('no session');
             redirect('/')
         }
     }, [status]);
