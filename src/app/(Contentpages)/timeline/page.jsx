@@ -3,16 +3,23 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import LogoutButton from "../../components/LogoutButton";
+import { useEffect} from 'react';
+import { Post } from "@/app/components/Post";
+import Image from "next/image";
 
 
 const Timeline = () => {
     const router = useRouter(); 
     const { data: session } = useSession();
-    const [userDetails, setUserDetails] = useState(null)
 
-    
+    const fakePosts = Array.from({ length: 30 }, (_, index) => ({
+        id: index,
+        image: `https://via.placeholder.com/150?text=Post+${index + 1}`, // Beispiel-URL für Bilder
+        likes: Math.floor(Math.random() * 100),
+        comments: Math.floor(Math.random() * 50),
+      }));
+
+      
     //useEffect for redirection in case no user is logged in
     useEffect(() => {
         if (!session) {
@@ -25,15 +32,25 @@ const Timeline = () => {
  
     //component that shows logout button and active user data
     return (
-        <div className="flex w-full h-screen flex-col">
-            
-            <div className="flex flex-col items-center justify-center flex-grow"> 
-            
-                <p>Username: {session.user.username}</p> 
-                <p>User ID: {session.user.id}</p>
-                <p>Email: {session.user.email}</p>
+        <div>
+            <Image 
+                className="m-5"
+                src='/eagler.svg'
+                alt="Logo"
+                width={80}
+                height={80}
+            />
+            <div className="max-w-[90%] mx-32">
+                <div className="flex w-full h-screen flex-col">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                    {fakePosts.map(post => (
+                        <Post key={post.id} post={post} />
+                    ))}
+                    </div>
+                </div> 
             </div>
-        </div>
+            
+      </div>
     );
     
 };

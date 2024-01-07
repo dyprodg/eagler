@@ -3,16 +3,16 @@
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+//atm not in use because of layoutchange
 
 const LogoutButton = () => {
     // Initialize the router for navigation
     const router = useRouter();
 
     // Handle logout button click
-    const handleLogoutButton = async () => {
+    const  handleLogoutButton = async () => {
         // Call the signOut function from next-auth with redirect set to false
         await signOut({ redirect: false });
-
         // Redirect to the root ('/') page after logout
         router.push('/');
     }
