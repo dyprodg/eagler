@@ -2,12 +2,11 @@
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-
-    experimental: {
-
-
+    images:{
+      domains: [
+        'www.gravatar.com'
+      ]
     },
-  
     // Weitere Konfigurationen können hier hinzugefügt werden
   };
   
