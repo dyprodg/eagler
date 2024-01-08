@@ -1,6 +1,11 @@
+'use client'
 import UploadForm from "@/app/components/UploadForm"
 
+
+
+
 const Upload = () => {
+
   return (
     <div className="flex w-full h-screen flex-col justify-center">
       <div className="m-6">
