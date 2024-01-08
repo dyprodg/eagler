@@ -20,9 +20,9 @@ const Settings = () => {
             
             <div className="flex flex-col items-center justify-center flex-grow"> 
                 
-                <p>Username: {session.user.username}</p> 
-                <p>User ID: {session.user.id}</p>
-                <p>Email: {session.user.email}</p>
+                <p>Username: {session?.user?.username}</p> 
+                <p>User ID: {session?.user?.id}</p>
+                <p>Email: {session?.user?.email}</p>
                 <div>
                 <a className="button-28" href='/deleteaccount'>Delete Account</a>
 

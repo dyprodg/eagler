@@ -318,7 +318,7 @@
 .button::before {
   position: absolute;
   bottom: -20px;
-  content: "Upload";
+  content: "Choose File";
   color: white;
   /* transition-duration: .3s; */
   font-size: 0px;
