@@ -1,6 +1,8 @@
 'use server'
 import prisma from "@/lib/prisma"
 
+
+
 // function for prisma delete user
 export async function deleteAccount(prevState, formData) {
     
@@ -14,4 +16,12 @@ export async function deleteAccount(prevState, formData) {
     } catch (error) {
        return { message: `User could not be deleted, ${error}`}
     }
+}
+
+
+export async function getSignedURL(session) {
+    if(!session) {
+        return { failure: 'not authenticated'}
+    }
+    return {success: {url:"test"}}
 }

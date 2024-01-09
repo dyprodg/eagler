@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useState } from "react"
 import { useSession } from 'next-auth/react'
+import { getSignedURL } from "../actions"
 
 
 const UploadForm = () => {
@@ -11,6 +12,7 @@ const UploadForm = () => {
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState('')
+    const [statusMessage, setStatusMessage] = useState("");
 
     const buttonDisabled = content.length < 1 || loading;
 
@@ -30,14 +32,38 @@ const UploadForm = () => {
         }
     }
     
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        setStatusMessage("creating");
+        setLoading(true);
+    
+        if(file){
+            const signedURLResult = await getSignedURL(session)
+            if(signedURLResult.failure !== undefined){
+                console.error(signedURLResult.failure)
+                return
+            }
+            const { url } = signedURLResult.success
+            console.log({url})
+        }
+    
+        setStatusMessage("created");
+        setLoading(false);
+      };
     
 
   return (
     <div className="flex justify-center items-center">
         <form
             className="bumpup px-6 py-4 w-[1000px]"
-            onSubmit={""}
+            onSubmit={handleSubmit}
         >
+            {statusMessage && (
+                <p className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 mb-4 rounded relative">
+                    {statusMessage}
+                </p>
+                )}
             <div className="flex gap-4 pb-4 justify-center">
                 <div className="rounded-full h-12 w-12 overflow-hidden relative">
                     <Image 
@@ -107,9 +133,9 @@ const UploadForm = () => {
                 <div className="text-neutral-500">
                     <button
                         type="submit"
-                        className="border bg-green-500 text-black rounded-xl px-4 py-2"
-                        disabled={buttonDisabled}
-                        aria-disabled={buttonDisabled}
+                        className="border bg-green-500 text-black rounded-xl px-4 py-2 active:scale-110"
+                        //disabled={buttonDisabled}
+                        //aria-disabled={buttonDisabled}
                     >
                         Post
                     </button>
