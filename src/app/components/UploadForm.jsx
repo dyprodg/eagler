@@ -32,14 +32,29 @@ const UploadForm = () => {
         }
     }
     
+    const computeSHA256 = async (file) => {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        return hashHex;
+      };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        console.log(session)
         setStatusMessage("creating");
         setLoading(true);
-    
+        console.log(file.type)
         if(file){
-            const signedURLResult = await getSignedURL(session)
+            const signedURLResult = await getSignedURL({
+                session: session,
+                fileSize: file.size,
+                fileType: file.type,
+                checksum: await computeSHA256(file),
+              })
             if(signedURLResult.failure !== undefined){
                 console.error(signedURLResult.failure)
                 return
@@ -54,7 +69,6 @@ const UploadForm = () => {
                 body: file,
             })
         }
-    
         setStatusMessage("created");
         setLoading(false);
       };
@@ -78,7 +92,8 @@ const UploadForm = () => {
                         src={/*user.image ||*/  "https://www.gravatar.com/avatar/?d=mp"}
                         alt='avatar'
                         priority={true}
-                        fill={true}
+                        width={48}
+                        height={48}
                     />
                 </div>
 

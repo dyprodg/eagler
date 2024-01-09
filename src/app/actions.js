@@ -28,13 +28,39 @@ export async function deleteAccount(prevState, formData) {
 }
 
 
-export async function getSignedURL(session) {
+
+const allowedFileTypes = [
+    "image/jpeg",
+    "image/png",
+    "video/mp4",
+    "video/quicktime"
+  ]
+
+const maxFileSize = 1048576 * 10 // 10 MB
+
+export async function getSignedURL({session , fileType, fileSize, checksum}) {
     if(!session) {
-        return { failure: 'not authenticated'}
+        return { failure: `not authenticated`}
     }
+    console.log(session ,fileSize, fileType, checksum)
+
+    if(!allowedFileTypes.includes(fileType)) {
+        return { failure: `File type not allowed `}
+    }
+
+    if(fileSize > maxFileSize){
+        return { failure : 'File size too large'}
+    }
+
     const putObjectCommand = new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: "test-file"
+        Key: "test-file",
+        ContentType: fileType,
+        ContentLength: fileSize,
+        ChecksumSHA256: checksum,
+        Metadata: {
+            userId: `${session.user.id}`
+        } 
     })
 
     const url = await getSignedUrl(
