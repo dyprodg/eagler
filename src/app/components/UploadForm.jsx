@@ -54,6 +54,7 @@ const UploadForm = () => {
                 fileSize: file.size,
                 fileType: file.type,
                 checksum: await computeSHA256(file),
+                content: content,
               })
             if(signedURLResult.failure !== undefined){
                 console.error(signedURLResult.failure)
