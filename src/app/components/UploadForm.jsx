@@ -46,6 +46,13 @@ const UploadForm = () => {
             }
             const { url } = signedURLResult.success
             console.log({url})
+            await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": file.type
+                },
+                body: file,
+            })
         }
     
         setStatusMessage("created");
@@ -134,8 +141,8 @@ const UploadForm = () => {
                     <button
                         type="submit"
                         className="border bg-green-500 text-black rounded-xl px-4 py-2 active:scale-110"
-                        //disabled={buttonDisabled}
-                        //aria-disabled={buttonDisabled}
+                        disabled={buttonDisabled}
+                        aria-disabled={buttonDisabled}
                     >
                         Post
                     </button>
