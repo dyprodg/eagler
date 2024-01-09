@@ -71,6 +71,8 @@ const UploadForm = () => {
         }
         setStatusMessage("created");
         setLoading(false);
+        setContent("")
+        setFile(null)
       };
     
 
