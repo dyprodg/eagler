@@ -11,9 +11,10 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.485.0",
     "@aws-sdk/s3-request-presigner": "^3.485.0",
+    "@nextui-org/react": "^2.2.9",
     "@prisma/client": "^5.7.1",
     "bcryptjs": "^2.4.3",
-    "framer-motion": "^10.17.9",
+    "framer-motion": "^10.17.12",
     "gsap": "^3.12.4",
     "next": "14.0.4",
     "next-auth": "^4.24.5",

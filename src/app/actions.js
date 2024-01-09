@@ -46,7 +46,6 @@ export async function getSignedURL({session , fileType, fileSize, checksum, cont
     if(!session) {
         return { failure: `not authenticated`}
     }
-    console.log(session ,fileSize, fileType, checksum)
 
     if(!allowedFileTypes.includes(fileType)) {
         return { failure: `File type not allowed `}
@@ -79,7 +78,6 @@ export async function getSignedURL({session , fileType, fileSize, checksum, cont
                 imageUrl: `https://eagler-upload.s3.eu-central-1.amazonaws.com/${key}`,
                 userId: session.user.id,
                 content: content ,
-                user: session.user.username
             }
         });
         return { success: { url } };

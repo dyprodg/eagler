@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { useSession } from 'next-auth/react'
 import { getSignedURL } from "../actions"
+import {Spinner} from "@nextui-org/react";
 
 
 const UploadForm = () => {
@@ -44,10 +45,8 @@ const UploadForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(session)
         setStatusMessage("creating");
         setLoading(true);
-        console.log(file.type)
         if(file){
             const signedURLResult = await getSignedURL({
                 session: session,
@@ -154,14 +153,17 @@ const UploadForm = () => {
 
             <div className="flex justify-end items-center mt-5">
                 <div className="text-neutral-500">
+                    {loading ? (<div className="loader">Loading...</div> ): (
                     <button
-                        type="submit"
-                        className="border bg-green-500 text-black rounded-xl px-4 py-2 active:scale-110"
-                        disabled={buttonDisabled}
-                        aria-disabled={buttonDisabled}
-                    >
-                        Post
-                    </button>
+                    type="submit"
+                    className="border bg-green-500 text-black rounded-xl px-4 py-2 active:scale-110"
+                    disabled={buttonDisabled}
+                >
+                    Post
+                </button>
+
+                    )}
+                    
                 </div>
             </div>
         </form>
