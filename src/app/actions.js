@@ -75,7 +75,7 @@ export async function getSignedURL({session , fileType, fileSize, checksum, cont
     try {
         await prisma.post.create({
             data: {
-                imageUrl: `https://eagler-upload.s3.eu-central-1.amazonaws.com/${key}`,
+                imageUrl: `${process.env.IMAGE_UPLOAD_URL}${key}`,
                 userId: session.user.id,
                 content: content ,
             }
