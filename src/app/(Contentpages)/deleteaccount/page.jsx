@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from "next-auth/react";
-import { redirect } from 'next/navigation';
 import { deleteAccount } from '@/app/actions';
 import {useFormState} from 'react-dom'
 import { signOut } from 'next-auth/react';
@@ -16,16 +15,7 @@ const DeleteAccountPage = () => {
         
     const [state, formAction]= useFormState(deleteAccount, initialState)
 
-
-
-    //unauthorized redirect
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            redirect('/')
-        }
-    }, [status]);
-
-   
+    redirectNoSession(session)
     //redirect and logout after successfull user deletion
     useEffect(() => {
         let timer;

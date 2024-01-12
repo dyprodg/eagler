@@ -2,42 +2,48 @@
 
 
 import { useSession } from "next-auth/react";
-import { redirect, useRouter } from 'next/navigation';
-import { useEffect} from 'react';
 import { Post } from "@/app/components/Post";
 import Image from "next/image";
+import redirectNoSession from "@/lib/nosession"
+import { useState } from "react";
+import { getLatestPosts } from "@/app/actions";
 
 
 const Timeline = () => {
-    const router = useRouter(); 
-    const { data: session } = useSession();
-    useEffect(() => {
-        if (!session) {
-            redirect('/');
-        }
-    }, [session, router]);
-    if (!session) {
-        return null; 
-    }
 
-    const fakePosts = Array.from({ length: 30 }, (_, index) => ({
-        id: index,
-        image: `https://via.placeholder.com/150?text=Post+${index + 1}`, // Beispiel-URL für Bilder
-        likes: Math.floor(Math.random() * 100),
-        comments: Math.floor(Math.random() * 50),
-      }));
-
-      
     //useEffect for redirection in case no user is logged in
+    const { data: session } = useSession();
+    redirectNoSession(session)
 
-    //component that shows logout button and active user data
+    const [posts, setPosts] = useState([])
+    const [lastPostId, setLastPostId] = useState(null)
+
+
+
+    const fetchPosts = async () => {
+        try {
+            const newPosts = await getLatestPosts(lastPostId);
+            setPosts(prevPosts => [...prevPosts, ...newPosts]);
+            const newLastPostId = newPosts[newPosts.length - 1]?.id;
+            if (newLastPostId) {
+                setLastPostId(newLastPostId);
+            }
+        } catch (error) {
+            console.error('error loading posts');
+        }
+    }
     return (
         <div>
-            
+             <button
+                    className="border border-black mt-32 active:scale-90 hover:scale-105"
+                    onClick={fetchPosts}
+                >Fetch Posts</button>
             <div className="max-w-[90%] md:mx-32 ml-12">
+           
                 <div className="flex w-full h-screen flex-col">
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                    {fakePosts.map(post => (
+                    {posts.map(post => (
                         <Post key={post.id} post={post} />
                     ))}
                     </div>

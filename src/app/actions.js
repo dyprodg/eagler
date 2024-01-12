@@ -85,6 +85,34 @@ export async function getSignedURL({session , fileType, fileSize, checksum, cont
         console.error("Fehler beim Erstellen des Posts:", error);
         return { failure: "Fehler beim Speichern des Posts in der Datenbank" };
     }
-    
+}
 
+
+export async function getLatestPosts(lastPostId) {
+    try {
+        const queryOptions = {
+            take: 10, 
+            orderBy: {
+                id: 'desc' 
+            },
+            include: {
+                user: true,
+                likes: true, 
+                comments: true  
+            }
+        };
+
+        if (lastPostId) {
+            queryOptions.cursor = {
+                id: lastPostId
+            };
+            queryOptions.skip = 1; 
+        }
+
+        const posts = await prisma.post.findMany(queryOptions);
+
+        return posts;
+    } catch (error) {
+        throw error;
+    }
 }
