@@ -5,9 +5,10 @@ import { FaRegComment } from "react-icons/fa";
 
 export const Post = ({post}) => {
   return (
-    <div className="border p-2 flex flex-col">
+    <div className="border p-2 flex flex-col max-w-[400px]">
         <div className='pb-2 font-semibold'>{post.user.username}</div>
-        <p>{post.id}{post.content}</p>
+        <p>postid:{post.id}</p>
+        <p>description:{post.content}</p>
         <img src={post.imageUrl} alt={`Post ${post.id}`} />
         <div className="flex justify-between mt-2">
         <button className='flex justify-center items-center'><BiLike className='mx-2 hover:scale-110'/>{`${post.likes}`}</button>

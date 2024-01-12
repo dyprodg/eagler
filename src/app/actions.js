@@ -1,6 +1,6 @@
 'use server'
 import prisma from "@/lib/prisma"
-import {S3Client, PutObjectCommand, PutObjectAclCommand } from '@aws-sdk/client-s3'
+import {S3Client, PutObjectCommand, PutObjectAclCommand , DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from 'crypto'
 
@@ -91,7 +91,7 @@ export async function getSignedURL({session , fileType, fileSize, checksum, cont
 export async function getLatestPosts(lastPostId) {
     try {
         const queryOptions = {
-            take: 10, 
+            take: 9, 
             orderBy: {
                 id: 'desc' 
             },
@@ -114,5 +114,69 @@ export async function getLatestPosts(lastPostId) {
         return posts;
     } catch (error) {
         throw error;
+    }
+}
+
+export async function getUserPosts(userid) {
+    try {
+        const queryOptions = {
+            where: {
+                userId: userid, 
+            },
+            orderBy: {
+                id: 'desc' 
+            },
+            include: {
+                user: true, 
+                likes: true, 
+                comments: true 
+            }
+        };
+
+        const userPosts = await prisma.post.findMany(queryOptions);
+
+        return userPosts;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function deletePost(session, post) {
+    try {
+        // Find the post by id
+        const foundPost = await prisma.post.findUnique({
+            where: { id: post.id }
+        });
+
+        if (!foundPost) {
+            throw new Error('Post not found');
+        }
+
+        // Check if the session user is the owner of the post
+        if (session.user.id === foundPost.userId) {
+            // Delete the post from the database
+            await prisma.post.delete({
+                where: { id: post.id }
+            });
+
+            // Extract the key from the post's imageUrl
+            const imageUrl = foundPost.imageUrl;
+            const key = imageUrl.split('/').pop();
+
+            // Prepare the delete parameters
+            const deleteParams = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: key,
+            };
+
+            // Delete the image from S3 using DeleteObjectCommand
+            await s3Client.send(new DeleteObjectCommand(deleteParams));
+
+            return { success: 'Post deleted successfully' };
+        } else {
+            throw new Error('Unauthorized to delete this post');
+        }
+    } catch (error) {
+        return { failure: error.message };
     }
 }
