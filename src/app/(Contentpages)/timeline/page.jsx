@@ -8,6 +8,7 @@ import redirectNoSession from "@/lib/nosession"
 import { useState, useEffect,useRef } from "react";
 import { getLatestPosts } from "@/app/actions";
 import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
+import ScrollToTopButton from "@/app/components/ScrollToTopButton";
 
 
 const Timeline = () => {
@@ -19,6 +20,7 @@ const Timeline = () => {
     const [posts, setPosts] = useState([])
     const [lastPostId, setLastPostId] = useState(null)
     const loaderRef = useRef(null)
+    const [showScrollTopButton, setShowScrollTopButton] = useState(false);
 
 
     const fetchPosts = async () => {
@@ -53,6 +55,26 @@ const Timeline = () => {
             }
         };
     }, [lastPostId]);
+
+    const checkScrollTop = () => {
+        if (!showScrollTopButton && window.pageYOffset > 400){
+            setShowScrollTopButton(true);
+        } else if (showScrollTopButton && window.pageYOffset <= 400){
+            setShowScrollTopButton(false);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', checkScrollTop);
+        return () => window.removeEventListener('scroll', checkScrollTop);
+    }, [showScrollTopButton]);
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Smooth scroll
+        });
+    };
     
 
     return (
@@ -65,15 +87,15 @@ const Timeline = () => {
                     {posts.map(post => (
                         <Post key={post.id} post={post} />
                     ))}
-                    
-                    </div>
                     <div className="w-full justify-center" ref={loaderRef} >
                         <SpinnerLoader />
                     </div>
+                    </div>
+                    
                 </div> 
                 
             </div>
-            
+            <ScrollToTopButton isVisible={showScrollTopButton} scrollToTop={scrollToTop} />  
       </div>
     );
     
