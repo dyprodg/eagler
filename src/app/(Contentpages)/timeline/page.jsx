@@ -1,0 +1,82 @@
+'use client'
+
+
+import { useSession } from "next-auth/react";
+import { Post } from "@/app/components/Post";
+import Image from "next/image";
+import redirectNoSession from "@/lib/nosession"
+import { useState, useEffect,useRef } from "react";
+import { getLatestPosts } from "@/app/actions";
+import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
+
+
+const Timeline = () => {
+
+    //useEffect for redirection in case no user is logged in
+    const { data: session } = useSession();
+    redirectNoSession(session)
+
+    const [posts, setPosts] = useState([])
+    const [lastPostId, setLastPostId] = useState(null)
+    const loaderRef = useRef(null)
+
+
+    const fetchPosts = async () => {
+        try {
+            const newPosts = await getLatestPosts(lastPostId);
+            setPosts(prevPosts => [...prevPosts, ...newPosts]);
+            const newLastPostId = newPosts[newPosts.length - 1]?.id;
+            if (newLastPostId) {
+                setLastPostId(newLastPostId);
+            }
+        } catch (error) {
+            console.error('error loading posts');
+        }
+    }
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            const firstEntry = entries[0];
+            if (firstEntry.isIntersecting) {
+                fetchPosts();
+            }
+        }, { threshold: 1.0 });
+
+        const currentLoaderRef = loaderRef.current;
+        if (currentLoaderRef) {
+            observer.observe(currentLoaderRef);
+        }
+
+        return () => {
+            if (currentLoaderRef) {
+                observer.disconnect();
+            }
+        };
+    }, [lastPostId]);
+    
+
+    return (
+        <div>
+            <div className="max-w-[90%] md:mx-32 ml-12">
+           
+                <div className="flex w-full h-screen flex-col">
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                    {posts.map(post => (
+                        <Post key={post.id} post={post} />
+                    ))}
+                    
+                    </div>
+                    <div className="w-full justify-center" ref={loaderRef} >
+                        <SpinnerLoader />
+                    </div>
+                </div> 
+                
+            </div>
+            
+      </div>
+    );
+    
+};
+
+export default Timeline;
