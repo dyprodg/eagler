@@ -3,12 +3,13 @@ module.exports = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'eagler-upload.s3.eu-central-1.amazonaws.com',
+        hostname: 'www.gravatar.com',
         pathname: '/*',
       },
       {
-        protocol: 'https',
-        hostname: 'www.gravatar.com',
+        protocol: 'http',
+        hostname: 'eagler-upload.s3.eu-central-1.amazonaws.com',
+        port: '',
         pathname: '/*',
       }
     ],
