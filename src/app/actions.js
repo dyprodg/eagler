@@ -75,7 +75,7 @@ export async function getSignedURL({session , fileType, fileSize, checksum, cont
     try {
         await prisma.post.create({
             data: {
-                imageUrl: `${process.env.IMAGE_UPLOAD_URL}${key}`,
+                imageUrl: `${process.env.IMAGE_STORAGE_URL}${key}.jpeg`,
                 userId: session.user.id,
                 content: content ,
             }

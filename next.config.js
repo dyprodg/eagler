@@ -8,7 +8,7 @@ module.exports = {
       },
       {
         protocol: 'http',
-        hostname: 'eagler-upload.s3.eu-central-1.amazonaws.com',
+        hostname: 'eagler-pictures-target-bucket.s3.eu-central-1.amazonaws.com',
         port: '',
         pathname: '/*',
       }

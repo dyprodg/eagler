@@ -13,7 +13,7 @@ export async function POST(req) {
 
         // Check if email and username are provided
         if (!email || !username) {
-            return NextResponse.json({ message: 'Email and Username are required' });
+            return NextResponse.json({ status: 409, message: 'Email and Username are required' });
         }
 
         // Check if an existing user with the same email or username already exists
@@ -38,7 +38,9 @@ export async function POST(req) {
             data: {
                 username,
                 email,
-                password: hashedPassword
+                auth: {
+                    create: { password: hashedPassword }
+                }
             }
         });
 

@@ -3,7 +3,6 @@
 
 import { useSession } from "next-auth/react";
 import { Post } from "@/app/components/Post";
-import Image from "next/image";
 import redirectNoSession from "@/lib/nosession"
 import { useState, useEffect,useRef } from "react";
 import { getLatestPosts } from "@/app/actions";

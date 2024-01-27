@@ -21,14 +21,19 @@ export const authOptions = {
                     // Find a user in the database based on the provided email
                     const user = await prisma.user.findUnique({
                         where: { email },
+                        include: {
+                            auth: true // Include the user authentication record
+                        }
                     });
 
                     // Check if the user doesn't exist or the password doesn't match
-                    if (!user || !await bcrypt.compare(password, user.password)) {
-                        return null;
+                    if (user && user.auth && await bcrypt.compare(password, user.auth.password)) {
+                        // Exclude the password and auth fields from the returned user object
+                        const { auth, ...userWithoutAuth } = user;
+                        return userWithoutAuth; // Return the authenticated user without the password
                     }
-
-                    return user; // Return the authenticated user
+    
+                    return null;
                 } catch (error) {
                     console.log('Error:', error);
                 }
