@@ -1,15 +1,17 @@
-/**
- * @type {import('next').NextConfig}
- */
-const nextConfig = {
-
-    experimental: {
-
-
-    },
-  
-    // Weitere Konfigurationen können hier hinzugefügt werden
-  };
-  
-  module.exports = nextConfig;
-  
+module.exports = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.gravatar.com',
+        pathname: '/*',
+      },
+      {
+        protocol: 'http',
+        hostname: 'eagler-pictures-target-bucket.s3.eu-central-1.amazonaws.com',
+        port: '',
+        pathname: '/*',
+      }
+    ],
+  },
+}

@@ -2,48 +2,99 @@
 
 
 import { useSession } from "next-auth/react";
-import { redirect, useRouter } from 'next/navigation';
-import { useEffect} from 'react';
 import { Post } from "@/app/components/Post";
-import Image from "next/image";
+import redirectNoSession from "@/lib/nosession"
+import { useState, useEffect,useRef } from "react";
+import { getLatestPosts } from "@/app/actions";
+import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
+import ScrollToTopButton from "@/app/components/ScrollToTopButton";
 
 
 const Timeline = () => {
-    const router = useRouter(); 
+
+    //useEffect for redirection in case no user is logged in
     const { data: session } = useSession();
-    useEffect(() => {
-        if (!session) {
-            redirect('/');
+    redirectNoSession(session)
+
+    const [posts, setPosts] = useState([])
+    const [lastPostId, setLastPostId] = useState(null)
+    const loaderRef = useRef(null)
+    const [showScrollTopButton, setShowScrollTopButton] = useState(false);
+
+
+    const fetchPosts = async () => {
+        try {
+            const newPosts = await getLatestPosts(lastPostId);
+            setPosts(prevPosts => [...prevPosts, ...newPosts]);
+            const newLastPostId = newPosts[newPosts.length - 1]?.id;
+            if (newLastPostId) {
+                setLastPostId(newLastPostId);
+            }
+        } catch (error) {
+            console.error('error loading posts');
         }
-    }, [session, router]);
-    if (!session) {
-        return null; 
     }
 
-    const fakePosts = Array.from({ length: 30 }, (_, index) => ({
-        id: index,
-        image: `https://via.placeholder.com/150?text=Post+${index + 1}`, // Beispiel-URL für Bilder
-        likes: Math.floor(Math.random() * 100),
-        comments: Math.floor(Math.random() * 50),
-      }));
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            const firstEntry = entries[0];
+            if (firstEntry.isIntersecting) {
+                fetchPosts();
+            }
+        }, { threshold: 1.0 });
 
-      
-    //useEffect for redirection in case no user is logged in
+        const currentLoaderRef = loaderRef.current;
+        if (currentLoaderRef) {
+            observer.observe(currentLoaderRef);
+        }
 
-    //component that shows logout button and active user data
+        return () => {
+            if (currentLoaderRef) {
+                observer.disconnect();
+            }
+        };
+    }, [lastPostId]);
+
+    const checkScrollTop = () => {
+        if (!showScrollTopButton && window.pageYOffset > 400){
+            setShowScrollTopButton(true);
+        } else if (showScrollTopButton && window.pageYOffset <= 400){
+            setShowScrollTopButton(false);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', checkScrollTop);
+        return () => window.removeEventListener('scroll', checkScrollTop);
+    }, [showScrollTopButton]);
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Smooth scroll
+        });
+    };
+    
+
     return (
         <div>
-            
             <div className="max-w-[90%] md:mx-32 ml-12">
+           
                 <div className="flex w-full h-screen flex-col">
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                    {fakePosts.map(post => (
+                    {posts.map(post => (
                         <Post key={post.id} post={post} />
                     ))}
+                    <div className="w-full justify-center" ref={loaderRef} >
+                        <SpinnerLoader />
                     </div>
+                    </div>
+                    
                 </div> 
+                
             </div>
-            
+            <ScrollToTopButton isVisible={showScrollTopButton} scrollToTop={scrollToTop} />  
       </div>
     );
     

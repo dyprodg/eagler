@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import CheckMark from "@/app/components/CheckMark";
+import CheckMark from "@/app/components/loaders/checkMark";
 import RegistrationForm from "./RegistrationForm";
 import { signIn } from "next-auth/react";
 
