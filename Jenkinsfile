@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     // Ruft das Shell-Skript auf, um das Docker-Image zu bauen und zu pushen
-                    sh 'sudo ./build-and-push.sh'
+                    sh './build-and-push.sh'
                 }
             }
         }
