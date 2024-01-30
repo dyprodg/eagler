@@ -6,6 +6,7 @@ COPY package.json package-lock.json ./
 ENV NODE_ENV=production
 RUN npm ci
 COPY . .
+RUN npm install autoprefixer
 RUN npm run build
 
 FROM node:18-alpine as runner
