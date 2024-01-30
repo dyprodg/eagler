@@ -9,7 +9,6 @@ npm i sharp
 
 Update Start script
 
-
 {
     "scripts" : {
         "start": "node server.js",
