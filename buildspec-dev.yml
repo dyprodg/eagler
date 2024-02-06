@@ -21,15 +21,7 @@ phases:
   build:
     commands:
       - docker build -t myapp .
-      - >
-        if [ -z "$(docker ps -q -f name=sonarqube)" ]; then
-          echo "Starting SonarQube container..."
-          docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
-          sleep 10 # Warten, bis SonarQube gestartet ist
-        else
-          echo "SonarQube container already running."
-        fi
-      - sonar-scanner 
+
 
       - |
         SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
@@ -40,8 +32,11 @@ phases:
         AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
         AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
         AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
+        SONAR_TOKEN=$(echo $SECRETS | jq -r .SONAR_TOKEN)
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
+      - sonar-scanner \
+        -Dsonar.password=$SONAR_TOKEN
       - docker build -t myapp .
       - >
         docker run \
