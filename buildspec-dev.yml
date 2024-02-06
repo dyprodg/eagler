@@ -30,6 +30,7 @@ phases:
         -Dsonar.host.url=http://localhost:9000 \
         -Dsonar.login=admin \
         -Dsonar.password=admin
+
       - |
         SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
         DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
