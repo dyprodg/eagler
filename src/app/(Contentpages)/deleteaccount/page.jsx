@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import { deleteAccount } from '@/app/actions';
 import {useFormState} from 'react-dom'
@@ -8,7 +8,7 @@ import CheckMark from '@/app/components/loaders/checkMark';
 import redirectNoSession from '@/lib/nosession';
 
 const DeleteAccountPage = () => {
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     const [emailInput, setEmailInput] = useState('');
     const initialState = {
         message: '',
