@@ -24,12 +24,7 @@ phases:
       - docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
       - sleep 10 # Wait for SonarQube to start
       # Run SonarQube analysis
-      - sonar-scanner \
-        -Dsonar.projectKey=myapp \
-        -Dsonar.sources=src \
-        -Dsonar.host.url=http://localhost:9000 \
-        -Dsonar.login=admin \
-        -Dsonar.password=admin
+      - sonar-scanner 
 
       - |
         SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
