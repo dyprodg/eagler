@@ -2,7 +2,7 @@
 import { redirect, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-const redirectNoSession = (session) => {
+const useRedirectNoSession = (session) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -10,10 +10,6 @@ const redirectNoSession = (session) => {
       redirect("/");
     }
   }, [session, router]);
-
-  if (!session) {
-    return null;
-  }
 };
 
-export default redirectNoSession;
+export default useRedirectNoSession;

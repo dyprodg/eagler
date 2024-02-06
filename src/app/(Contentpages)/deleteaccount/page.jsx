@@ -5,7 +5,7 @@ import { deleteAccount } from "@/app/actions";
 import { useFormState } from "react-dom";
 import { signOut } from "next-auth/react";
 import CheckMark from "@/app/components/loaders/checkMark";
-import redirectNoSession from "@/lib/nosession";
+import useRedirectNoSession from "@/lib/nosession";
 
 const DeleteAccountPage = () => {
   const { data: session } = useSession();
@@ -16,7 +16,7 @@ const DeleteAccountPage = () => {
 
   const [state, formAction] = useFormState(deleteAccount, initialState);
 
-  redirectNoSession(session);
+  useRedirectNoSession(session);
   //redirect and logout after successfull user deletion
   useEffect(() => {
     let timer;
