@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto17
+      java: openjdk11
       nodejs: 20
     commands:
       - npm install
@@ -12,17 +12,6 @@ phases:
       - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
       - export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
 
-      # Überprüfen der Java-Version vor der Aktualisierung der Umgebungsvariablen
-      - echo "Java version before setting JAVA_HOME:"
-      - java -version
-
-      # Festlegen der JAVA_HOME- und PATH-Variablen
-      - export JAVA_HOME="$JAVA_17_HOME"
-      - export PATH=$JAVA_HOME/bin:$PATH
-
-      # Überprüfen der Java-Version nach der Aktualisierung der Umgebungsvariablen
-      - echo "Java version after setting JAVA_HOME:"
-      - java -version
 
   pre_build:
     commands:
