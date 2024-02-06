@@ -2,8 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { Post } from "@/app/components/Post";
-import { redirect, useRouter , useCallback} from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { redirect, useRouter } from "next/navigation";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { getLatestPosts } from "@/app/actions";
 import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
 import ScrollToTopButton from "@/app/components/ScrollToTopButton";
