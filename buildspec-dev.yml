@@ -1,0 +1,74 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm install
+      # Install SonarQube Scanner
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+      - export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
+
+  pre_build:
+    commands:
+      - npm test
+      - npx prettier --check .
+      - npm run lint
+
+  build:
+    commands:
+      - docker build -t myapp .
+      # Run SonarQube analysis
+      - sonar-scanner \
+        -Dsonar.projectKey=myapp \
+        -Dsonar.sources=. \
+        -Dsonar.host.url=http://your-sonarqube-server:9000 \
+        -Dsonar.login=your-sonarqube-token
+      - |
+        SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
+        DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
+        NEXTAUTH_SECRET=$(echo $SECRETS | jq -r .NEXTAUTH_SECRET)
+        AWS_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_ACCESS_KEY)
+        AWS_SECRET_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_SECRET_ACCESS_KEY)
+        AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
+        AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
+        AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
+        IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
+        IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
+      - docker build -t myapp .
+      - > 
+        docker run \
+          -e DATABASE_URL="$DATABASE_URL" \
+          -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
+          -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
+          -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+          -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
+          -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
+          -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
+          -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
+          -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
+          -p 80:3000 \
+          --log-driver=awslogs \
+          --log-opt awslogs-region=eu-central-1 \
+          --log-opt awslogs-group=eagler/ec2 \
+          --log-opt awslogs-stream={instance_id} \
+          -d \
+          myapp
+
+  post_build:
+    commands:
+      - echo "Build and analysis completed"
+      # Warten, bis der Docker-Container hochgefahren ist
+      - sleep 10
+      # Gesundheitscheck durchführen
+      - curl -f http://localhost:80/ || exit 1
+      - echo "Health check passed"
+      - docker stop myapp
+      - docker rm myapp
+      - echo "Docker container stopped and removed"
+
+artifacts:
+  files:
+    - '**/*'
