@@ -5,8 +5,9 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - docker stop sonarqube
-      - docker rm sonarqube
+      - docker stop $(docker ps -aq)
+      - docker rm $(docker ps -aq)
+
       - npm install
       # Install SonarQube Scanner
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
