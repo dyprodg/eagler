@@ -3,7 +3,7 @@ import { signOut } from "next-auth/react";
 import styles from "./style.module.scss";
 import { useRouter } from "next/navigation";
 
-export default function index() {
+export default function Footer() {
   const router = useRouter();
 
   const handleLogout = async () => {

@@ -60,7 +60,7 @@ const Timeline = () => {
         observer.disconnect();
       }
     };
-  }, [lastPostId]);
+  }, [lastPostId, fetchPosts]);
 
   const checkScrollTop = useCallback(() => {
     if (!showScrollTopButton && window.pageYOffset > 400) {

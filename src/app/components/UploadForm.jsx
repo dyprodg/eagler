@@ -108,11 +108,13 @@ const UploadForm = () => {
             <div className="flex w-full justify-center items-center">
               {previewUrl && file && (
                 <div className="mt-4 max-w-[500px]">
-                  {file.type.startsWith("image/") ? (
-                    <img src={previewUrl} alt="Selected file" className="" />
-                  ) : file.type.startsWith("video/") ? (
-                    <video src={previewUrl} controls className="" />
-                  ) : null}
+                  <Image 
+                    src={previewUrl} 
+                    alt="Selected file" 
+                    width={500}  // Set the desired width
+                    height={300} // Set the desired height
+                    className=""
+                  />
                 </div>
               )}
             </div>
