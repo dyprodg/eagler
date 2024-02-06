@@ -6,6 +6,10 @@ phases:
       java: corretto17
       nodejs: 20
     commands:
+      - echo "Java version: $(java -version)"
+      - export JAVA_HOME="$JAVA_17_HOME"
+      - export PATH=$JAVA_HOME/bin:$PATH
+      - echo "Java version: $(java -version)"
       - npm install
       # Install SonarQube Scanner
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
