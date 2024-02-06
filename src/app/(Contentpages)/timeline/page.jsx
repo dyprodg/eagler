@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { getLatestPosts } from "@/app/actions";
 import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
 import ScrollToTopButton from "@/app/components/ScrollToTopButton";
-import { check } from "prisma";
+
 
 const Timeline = () => {
   //useEffect for redirection in case no user is logged in

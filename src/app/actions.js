@@ -33,8 +33,7 @@ export async function deleteAccount(prevState, formData) {
 const allowedFileTypes = [
   "image/jpeg",
   "image/png",
-  "video/mp4",
-  "video/quicktime",
+  "image/jpg",
 ];
 
 const maxFileSize = 1048576 * 10; // 10 MB
