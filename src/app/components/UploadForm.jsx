@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { getSignedURL } from "../actions";
-import { Spinner } from "@nextui-org/react";
 
 const UploadForm = () => {
   const { data: session } = useSession();

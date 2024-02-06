@@ -1,6 +1,6 @@
 "use client";
 
-import useRedirectNoSession from "@/lib/nosession";
+import { redirect, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 
@@ -8,7 +8,14 @@ const Settings = () => {
   const { data: session } = useSession();
 
   //useEffect for redirection in case no user is logged in
-  useRedirectNoSession(session)
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!session) {
+      redirect("/");
+    }
+  }, [session, router]);
+
 
   //component that shows logout button and active user data
   return (

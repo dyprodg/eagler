@@ -4,11 +4,20 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Post } from "@/app/components/Post";
 import { deletePost, getUserPosts } from "@/app/actions";
+import { redirect, useRouter } from "next/navigation";
 
 const Profile = () => {
   const { data: session } = useSession();
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!session) {
+      redirect("/");
+    }
+  }, [session, router]);
 
   useEffect(() => {
     const fetchUserPosts = async () => {

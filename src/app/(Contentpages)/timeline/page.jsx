@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { Post } from "@/app/components/Post";
-import useRedirectNoSession from "@/lib/nosession";
+import { redirect, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { getLatestPosts } from "@/app/actions";
 import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
@@ -11,7 +11,14 @@ import ScrollToTopButton from "@/app/components/ScrollToTopButton";
 const Timeline = () => {
   //useEffect for redirection in case no user is logged in
   const { data: session } = useSession();
-  useRedirectNoSession(session);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!session) {
+      redirect("/");
+    }
+  }, [session, router]);
+
 
   const [posts, setPosts] = useState([]);
   const [lastPostId, setLastPostId] = useState(null);

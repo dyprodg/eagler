@@ -1,11 +1,18 @@
 "use client";
 import UploadForm from "@/app/components/UploadForm";
 import { useSession } from "next-auth/react";
-import useRedirectNoSession from "@/lib/nosession";
+import { redirect, useRouter } from "next/navigation";
 
 const Upload = () => {
   const { data: session } = useSession();
-  useRedirectNoSession(session);
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!session) {
+      redirect("/");
+    }
+  }, [session, router]);
+
 
   return (
     <div className="flex w-full h-screen flex-col justify-center">
