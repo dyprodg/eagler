@@ -5,9 +5,6 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - docker stop $(docker ps -aq)
-      - docker rm $(docker ps -aq)
-
       - npm install
       # Install SonarQube Scanner
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
@@ -24,9 +21,14 @@ phases:
   build:
     commands:
       - docker build -t myapp .
-      - docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
-      - sleep 10 # Wait for SonarQube to start
-      # Run SonarQube analysis
+      - >
+        if [ -z "$(docker ps -q -f name=sonarqube)" ]; then
+          echo "Starting SonarQube container..."
+          docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+          sleep 10 # Warten, bis SonarQube gestartet ist
+        else
+          echo "SonarQube container already running."
+        fi
       - sonar-scanner 
 
       - |
