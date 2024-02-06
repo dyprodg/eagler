@@ -11,7 +11,7 @@ export default async function Register() {
   const session = await getServerSession(authOptions);
 
   // If a session exists, redirect the user to the '/timeline' page
-  if (session) redirect('/timeline');
+  if (session) redirect("/timeline");
 
   // Render the registration page with components
   return (
@@ -19,20 +19,19 @@ export default async function Register() {
       <div className="fixed w-full flex justify-between items-center">
         {/* Render the 'RegisterButton' component */}
         <Image
-                className="m-5 hidden md:flex"
-                src='/eagler.svg'
-                alt="Logo"
-                width={50}
-                height={50}
-                priority
-            />
+          className="m-5 hidden md:flex"
+          src="/eagler.svg"
+          alt="Logo"
+          width={50}
+          height={50}
+          priority
+        />
         <RegisterButton />
       </div>
-      <div className="fixed top-0 left-0">
-      </div>
+      <div className="fixed top-0 left-0"></div>
       <div>
         {/* Render the 'LoginForm' component */}
-        <LoginForm classname='' />
+        <LoginForm classname="" />
       </div>
     </div>
   );

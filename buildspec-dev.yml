@@ -15,6 +15,7 @@ phases:
     commands:
       - npm test
       - npx prettier --check .
+      - npx prettier --write .
       - npm run lint
 
   build:
@@ -38,7 +39,7 @@ phases:
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
       - docker build -t myapp .
-      - > 
+      - >
         docker run \
           -e DATABASE_URL="$DATABASE_URL" \
           -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
@@ -71,4 +72,4 @@ phases:
 
 artifacts:
   files:
-    - '**/*'
+    - "**/*"
