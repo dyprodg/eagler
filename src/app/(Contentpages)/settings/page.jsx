@@ -1,7 +1,6 @@
 "use client";
 
 import useRedirectNoSession from "@/lib/nosession";
-import useRedirectNoSession from "@/lib/nosession";
 import { useSession } from "next-auth/react";
 
 
