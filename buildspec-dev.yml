@@ -74,7 +74,7 @@ phases:
       - docker stop sonarqube
       - docker rm myapp
       - docker rm sonarqube
-      - echo "Docker container stopped and removed"
+      - echo "Docker container stopped and removed!"
 
 artifacts:
   files:
