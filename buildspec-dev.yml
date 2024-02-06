@@ -29,7 +29,7 @@ phases:
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
       - >
         docker run \
-          -e SONAR_HOST_URL="http://<sonarqube-server>:<port>" \
+          -e SONAR_HOST_URL="http://3.67.65.204:9000" \
           -e SONAR_LOGIN="$SONAR_TOKEN" \
           -v $(pwd):/src \
           sonarsource/sonar-scanner-cli
