@@ -60,7 +60,7 @@ const Profile = () => {
 
   return (
     <div className="w-full flex flex-col m-4 mt-24 justify-center items-center">
-      <h1>{session?.user?.username}'s Profile</h1>
+      <h1>{session?.user?.username} Profile</h1>
       <div className="max-w-[90%]">
         {error && <p>{error}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">

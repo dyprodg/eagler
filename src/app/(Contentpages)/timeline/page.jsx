@@ -2,11 +2,12 @@
 
 import { useSession } from "next-auth/react";
 import { Post } from "@/app/components/Post";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter , useCallback} from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { getLatestPosts } from "@/app/actions";
 import SpinnerLoader from "@/app/components/loaders/SpinnerLoader";
 import ScrollToTopButton from "@/app/components/ScrollToTopButton";
+import { check } from "prisma";
 
 const Timeline = () => {
   //useEffect for redirection in case no user is logged in
@@ -25,7 +26,7 @@ const Timeline = () => {
   const loaderRef = useRef(null);
   const [showScrollTopButton, setShowScrollTopButton] = useState(false);
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       const newPosts = await getLatestPosts(lastPostId);
       setPosts((prevPosts) => [...prevPosts, ...newPosts]);
@@ -36,7 +37,7 @@ const Timeline = () => {
     } catch (error) {
       console.error("error loading posts");
     }
-  };
+  },[lastPostId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -61,18 +62,18 @@ const Timeline = () => {
     };
   }, [lastPostId]);
 
-  const checkScrollTop = () => {
+  const checkScrollTop = useCallback(() => {
     if (!showScrollTopButton && window.pageYOffset > 400) {
       setShowScrollTopButton(true);
     } else if (showScrollTopButton && window.pageYOffset <= 400) {
       setShowScrollTopButton(false);
     }
-  };
+  }, [showScrollTopButton]);
 
   useEffect(() => {
     window.addEventListener("scroll", checkScrollTop);
     return () => window.removeEventListener("scroll", checkScrollTop);
-  }, [showScrollTopButton]);
+  }, [checkScrollTop]);
 
   const scrollToTop = () => {
     window.scrollTo({
