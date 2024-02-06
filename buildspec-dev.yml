@@ -15,7 +15,7 @@ phases:
     commands:
       - npm test
       - npx prettier --write .
-      - npm run lint
+      - npx eslint --fix .
 
   build:
     commands:
