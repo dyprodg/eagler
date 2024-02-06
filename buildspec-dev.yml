@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: openjdk11
+      java: corretto11
       nodejs: 20
     commands:
       - npm install
@@ -11,7 +11,6 @@ phases:
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
       - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
       - export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
-
 
   pre_build:
     commands:
