@@ -3,14 +3,9 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11
       nodejs: 20
     commands:
       - npm install
-      # Install SonarQube Scanner
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
-      - export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
 
   pre_build:
     commands:
@@ -32,8 +27,12 @@ phases:
         SONAR_TOKEN=$(echo $SECRETS | jq -r .SONAR_TOKEN)
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-      - sonar-scanner \
-        -Dsonar.password=$SONAR_TOKEN
+      - >
+        docker run \
+          -e SONAR_HOST_URL="http://<sonarqube-server>:<port>" \
+          -e SONAR_LOGIN="$SONAR_TOKEN" \
+          -v $(pwd):/src \
+          sonarsource/sonar-scanner-cli
       - docker build -t myapp .
       - >
         docker run \
