@@ -7,6 +7,9 @@ phases:
     commands:
       - npm install
       # Install SonarQube Scanner
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+      - export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
       - docker pull sonarqube:latest
 
   pre_build:
@@ -24,8 +27,9 @@ phases:
       - sonar-scanner \
         -Dsonar.projectKey=myapp \
         -Dsonar.sources=. \
-        -Dsonar.host.url=http://your-sonarqube-server:9000 \
-        -Dsonar.login=your-sonarqube-token
+        -Dsonar.host.url=http://localhost:9000 \
+        -Dsonar.login=admin \
+        -Dsonar.password=admin
       - |
         SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
         DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
