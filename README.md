@@ -1,16 +1,15 @@
 For Deployment:
 
 const nextConfig = {
-    output: 'standalone',
+output: 'standalone',
 }
-
 
 npm i sharp
 
 Update Start script
 
 {
-    "scripts" : {
-        "start": "node server.js",
-    }
+"scripts" : {
+"start": "node server.js",
+}
 }

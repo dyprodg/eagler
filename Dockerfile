@@ -1,23 +1,65 @@
-# https://dev.to/rupadana/run-nextjs-using-docker-1a38
-FROM node:18-alpine as builder
-WORKDIR /my-space
+# Base image
+FROM node:18-alpine AS base
 
-COPY package.json package-lock.json ./
-ENV NODE_ENV=production
-RUN npm ci
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Generate Prisma client
+FROM base AS prisma-generator
+WORKDIR /app
+COPY prisma ./prisma/
+COPY --from=deps /app/node_modules ./node_modules
+RUN npx prisma generate
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=prisma-generator /app/node_modules ./node_modules
+COPY --from=prisma-generator /app/prisma ./prisma/
 COPY . .
+# Uncomment if you want to disable telemetry
+# ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
-FROM node:18-alpine as runner
-RUN apk add --no-cache curl
-WORKDIR /my-space
-COPY --from=builder /my-space/package.json .
-COPY --from=builder /my-space/package-lock.json .
-COPY --from=builder /my-space/next.config.js ./
-COPY --from=builder /my-space/public ./public
-COPY --from=builder /my-space/.next/standalone ./
-COPY --from=builder /my-space/.next/static ./.next/static
-ENV NODE_ENV=production
-ENV HOSTNAME=0.0.0.0
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+# Uncomment if you want to disable telemetry
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
 EXPOSE 3000
-CMD node server.js
+
+ENV PORT 3000
+# set hostname to localhost
+ENV HOSTNAME "0.0.0.0"
+
+# server.js is created by next build from the standalone output
+# https://nextjs.org/docs/pages/api-reference/next-config-js/output
+CMD ["node", "server.js"]
