@@ -9,11 +9,13 @@ phases:
 
   pre_build:
     commands:
-      - echo "Run Linting"
-      - npx eslint --fix .
+      - BUILD_STATUS=""
 
       - echo "Run code formatting"
       - npx prettier --write .
+
+      - echo "Run Linting"
+      - npx eslint --fix .
 
       - echo "Run Jest Testing"
       - npm test
@@ -66,13 +68,12 @@ phases:
           -d \
           $ECR_REPOSITORY_NAME
 
-      # Warten, bis der Docker-Container hochgefahren ist
+      - echo "10 Sec sleep to wait for docker container to start"
       - sleep 10
 
       - echo "Get Docker Container ID"
       - CONTAINER_ID=$(docker ps -l -q)
 
-      # Gesundheitscheck durchführen
       - echo "Start Health Check"
       - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
       - echo "Health check passed"
@@ -83,13 +84,17 @@ phases:
       - echo "Pushing Docker Image to ECR"
       - docker push $ECR_URI:$IMAGE_TAG
 
-      
-
+      - BUILD_STATUS="success"
+      - echo "Docker Image successfully build, tested and pushed"
 
   post_build:
     commands:
-      - echo "Docker Image successfully build, tested and pushed"
-      - echo "finishing of builder"
+      - |
+        if [ "$BUILD_STATUS" = "success" ]; then
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success. Image Pushed to ECR. Rolling update started"
+        else
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Building main Image failed!!!"
+        fi
 
 artifacts:
   files:
