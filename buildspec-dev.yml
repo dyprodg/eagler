@@ -12,10 +12,9 @@ phases:
       - npm test
       - npx prettier --write .
       - npx eslint --fix .
-      - docker ps
       - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
-      - docker stop ${CONTAINER_ID}
-      - docker rm ${CONTAINER_ID}
+      - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
+
 
   build:
     commands:
