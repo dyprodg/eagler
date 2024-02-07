@@ -44,7 +44,6 @@ phases:
           -p 80:3000 \
           -d \
           myapp
-      - docker ps
       - CONTAINER_ID=$(docker ps -l -q)
       
 
@@ -57,11 +56,7 @@ phases:
       # Gesundheitscheck durchführen
       - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
       - echo "Health check passed"
-      - docker stop CONTAINER_ID
-      - docker rm CONTAINER_ID
-      - echo "Docker container stopped and removed!"
-      - docker stop $(docker ps -aq)
-      - docker rm $(docker ps -aq)
+      - docker ps 
 
 artifacts:
   files:
