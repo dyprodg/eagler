@@ -13,7 +13,7 @@ phases:
       - npx prettier --write .
       - npx eslint --fix .
       - docker ps
-      - CONTAINER_ID=$(docker ps -l -q)
+      - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
       - docker stop ${CONTAINER_ID}
       - docker rm ${CONTAINER_ID}
 
