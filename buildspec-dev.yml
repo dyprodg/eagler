@@ -36,7 +36,6 @@ phases:
       # Send Build SNS
       - |
       if [ "$BUILD_STATUS" = "success" ]; then
-        gh pr create --base main --head dev --title "Testing dev branch successfull" --body "The tests and build of the dev branch got succesfully tested and are ready to be merged into main branch."
         aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. Pull Request Created"
       else
         echo "Build failed or status unknown, not sending SNS message."
