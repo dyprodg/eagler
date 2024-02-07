@@ -40,10 +40,6 @@ phases:
           -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
           -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
           -p 80:3000 \
-          --log-driver=awslogs \
-          --log-opt awslogs-region=eu-central-1 \
-          --log-opt awslogs-group=eagler/ec2 \
-          --log-opt awslogs-stream={instance_id} \
           -d \
           myapp
 
