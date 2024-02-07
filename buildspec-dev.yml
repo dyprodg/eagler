@@ -30,17 +30,13 @@ phases:
 
   post_build:
     commands:
-      
- 
-      # Bitte erstell mir hier ein contitional. whenn buildstatus = success, then do the sns
-      # Send Build SNS
       - |
-      if [ "$BUILD_STATUS" = "success" ]; then
-        aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. Pull Request Created"
-      else
-        echo "Build failed or status unknown, not sending SNS message."
-      fi
+        if [ "$BUILD_STATUS" = "success" ]; then
 
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. Pull Request Created"
+        else
+          echo "Build failed or status unknown, not sending SNS message."
+        fi
 
 
 
