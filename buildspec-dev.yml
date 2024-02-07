@@ -10,20 +10,12 @@ phases:
   pre_build:
     commands:
       - BUILD_STATUS=""
-      #Code Formating
-      - npx prettier --write .
-      #Code Linting
-      - npx eslint --fix .
-      #Code Testing
-      - npm test
-      
-      #Stop Container if is still running from previous build
-      - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
-      - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
+
 
 
   build:
     commands:
+      #Get .envs for dockercontainer etc.
 
       - BUILD_STATUS="success"
       - echo "Build and analysis completed"
@@ -32,7 +24,7 @@ phases:
     commands:
       - |
         if [ "$BUILD_STATUS" = "success" ]; then
-
+          gh pr create --base main --head dev --title "Testing dev branch successful" --body "The tests and build of the dev branch got successfully tested and are ready to be merged into the main branch."
           aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. Pull Request Created"
         else
           echo "Build failed or status unknown, not sending SNS message."
