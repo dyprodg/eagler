@@ -27,7 +27,7 @@ phases:
         DOCKER_PWD=$(echo $SECRETS | jq -r .DOCKER_PWD)
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-      - echo "$DOCKER_PWD" | docker login --username dyprodg --password-stdin
+      - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
 
       - docker build -t myapp .
       - >
