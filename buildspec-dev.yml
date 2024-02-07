@@ -28,10 +28,8 @@ phases:
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
       - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
-
       - docker build -t myapp .
-      - >
-        docker run \
+      - CONTAINER_ID=$(docker run \
           -e DATABASE_URL="$DATABASE_URL" \
           -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
           -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
@@ -43,7 +41,7 @@ phases:
           -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
           -p 80:3000 \
           -d \
-          myapp
+          myapp)
 
   post_build:
     commands:
@@ -51,10 +49,12 @@ phases:
       # Warten, bis der Docker-Container hochgefahren ist
       - sleep 10
       # Gesundheitscheck durchführen
-      - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
+      - docker inspect $CONTAINER_ID | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
       - echo "Health check passed"
-      - docker stop myapp
-      - docker rm myapp
+      - docker stop $CONTAINER_ID
+      - docker rm $CONTAINER_ID
+      - docker stop $(docker ps -aq)
+      - docker rm $(docker ps -aq)
       - echo "Docker container stopped and removed!"
 
 artifacts:
