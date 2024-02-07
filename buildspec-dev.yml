@@ -49,7 +49,7 @@ phases:
       # Warten, bis der Docker-Container hochgefahren ist
       - sleep 10
       # Gesundheitscheck durchführen
-      - curl -f http://localhost:80/ || exit 1
+      - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
       - echo "Health check passed"
       - docker stop myapp
       - docker rm myapp
