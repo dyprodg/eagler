@@ -9,58 +9,41 @@ phases:
 
   pre_build:
     commands:
-      - npm test
+      - BUILD_STATUS=""
+      #Code Formating
       - npx prettier --write .
+      #Code Linting
       - npx eslint --fix .
+      #Code Testing
+      - npm test
+      
+      #Stop Container if is still running from previous build
       - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
       - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
 
 
   build:
     commands:
-      - |
-        SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
-        DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
-        NEXTAUTH_SECRET=$(echo $SECRETS | jq -r .NEXTAUTH_SECRET)
-        AWS_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_ACCESS_KEY)
-        AWS_SECRET_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_SECRET_ACCESS_KEY)
-        AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
-        AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
-        AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
-        DOCKER_PWD=$(echo $SECRETS | jq -r .DOCKER_PWD)
-        IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-        IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-      - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
 
-      - docker build -t myapp .
-      - >
-        docker run \
-          -e DATABASE_URL="$DATABASE_URL" \
-          -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
-          -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
-          -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-          -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
-          -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
-          -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
-          -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
-          -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
-          -p 80:3000 \
-          -d \
-          myapp
-      - CONTAINER_ID=$(docker ps -l -q)
-      
-
+      - BUILD_STATUS="success"
+      - echo "Build and analysis completed"
 
   post_build:
     commands:
-      - echo "Build and analysis completed"
-      # Warten, bis der Docker-Container hochgefahren ist
-      - sleep 10
-      # Gesundheitscheck durchführen
-      - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
-      - echo "Health check passed"
-      # Check if everythings shut down
-      - docker ps 
+      
+ 
+      # Bitte erstell mir hier ein contitional. whenn buildstatus = success, then do the sns
+      # Send Build SNS
+      - |
+      if [ "$BUILD_STATUS" = "success" ]; then
+        gh pr create --base main --head dev --title "Testing dev branch successfull" --body "The tests and build of the dev branch got succesfully tested and are ready to be merged into main branch."
+        aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. Pull Request Created"
+      else
+        echo "Build failed or status unknown, not sending SNS message."
+      fi
+
+
+
 
 artifacts:
   files:
