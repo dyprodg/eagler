@@ -22,7 +22,7 @@ phases:
       - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
       - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
 
-      -echo "Setup ECR URI"
+      - echo "Setup ECR URI"
       - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME"
 
       -echo "Login to ECR"
