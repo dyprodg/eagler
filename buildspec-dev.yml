@@ -24,9 +24,11 @@ phases:
         AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
         AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
         AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
-        SONAR_TOKEN=$(echo $SECRETS | jq -r .SONAR_TOKEN)
+        DOCKER_PWD=$(echo $SECRETS | jq -r .DOCKER_PWD)
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
+      - echo "$DOCKER_PWD" | docker login --username dyprodg --password-stdin
+
       - docker build -t myapp .
       - >
         docker run \
