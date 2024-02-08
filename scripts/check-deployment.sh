@@ -3,6 +3,12 @@
 exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 
 echo "Starting the check-deployment.sh script..."
+echo "Starting the check-deployment.sh script..."
+echo "Starting the check-deployment.sh script..."
+echo "Starting the check-deployment.sh script..."
+echo "Starting the check-deployment.sh script..."
+echo "Starting the check-deployment.sh script..."
+
 
 # Warte, bis Port 80 verfügbar ist
 while ! nc -z localhost 80; do   

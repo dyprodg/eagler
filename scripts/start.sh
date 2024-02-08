@@ -3,6 +3,11 @@
 exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 
 echo "Starting the start.sh script..."
+echo "Starting the start.sh script..."
+echo "Starting the start.sh script..."
+echo "Starting the start.sh script..."
+echo "Starting the start.sh script..."
+echo "Starting the start.sh script..."
 
 # Clean Up
 

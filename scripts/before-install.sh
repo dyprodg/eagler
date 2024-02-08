@@ -2,6 +2,11 @@
 exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 
 echo "Starting the before-install.sh script..."
+echo "Starting the before-install.sh script..."
+echo "Starting the before-install.sh script..."
+echo "Starting the before-install.sh script..."
+echo "Starting the before-install.sh script..."
+
 
 
 
