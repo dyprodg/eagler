@@ -2,15 +2,15 @@ version: 0.0
 os: linux
 hooks:
   BeforeInstall:
-    - location: /home/ubuntu/before-install.sh
+    - location: scripts/before-install.sh
       timeout: 10
   
   Install:
-    - location: /home/ubuntu/start.sh
+    - location: scripts/start.sh
       timeout: 60
       runas: ubuntu
 
   AfterInstall:
-    - location: /home/ubuntu/check-deployment.sh
+    - location: scripts/check-deployment.sh
       timeout: 10
       runas: ubuntu
