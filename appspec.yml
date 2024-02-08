@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: check-deployment.sh
+    destination: /home/ubuntu/
+hooks:
+  AfterInstall:
+    - location: /home/ubuntu/check-deployment.sh
+      timeout: 60
+      runas: ubuntu
