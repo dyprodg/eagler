@@ -1,11 +1,10 @@
 #!/bin/bash
 
+exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 # Clean Up
 
 docker container prune -f
 docker image prune -f
-
-systemctl start codedeploy-agent
 
 # Login to ECR
 aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 283919506801.dkr.ecr.eu-central-1.amazonaws.com
