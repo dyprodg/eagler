@@ -1,8 +1,9 @@
 #!/bin/bash
 
+exec > >(while IFS= read -r line; do echo "$(date) $line"; done | tee -a /var/log/custom/scriptoutputs.log) 2>&1
+
 echo "Starting the before-install.sh script..."
 
-exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 
 # Überprüfen, ob Docker-Container ausgeführt werden
 if [ "$(docker ps -q)" ]; then

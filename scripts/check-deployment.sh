@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "Starting the check-deployment.sh script..."
+exec > >(while IFS= read -r line; do echo "$(date) $line"; done | tee -a /var/log/custom/scriptoutputs.log) 2>&1
 
-exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
+echo "Starting the check-deployment.sh script..."
 
 # Warte, bis Port 80 verfügbar ist
 while ! nc -z localhost 80; do   

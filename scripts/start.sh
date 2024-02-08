@@ -1,8 +1,9 @@
 #!/bin/bash
 
+exec > >(while IFS= read -r line; do echo "$(date) $line"; done | tee -a /var/log/custom/scriptoutputs.log) 2>&1
+
 echo "Starting the start.sh script..."
 
-exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 # Clean Up
 
 docker container prune -f
@@ -49,3 +50,6 @@ docker run \
   --log-opt awslogs-stream={instance_id} \
   -d \
   283919506801.dkr.ecr.eu-central-1.amazonaws.com/eagler-docker:latest
+
+
+sleep 10
