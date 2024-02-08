@@ -1,6 +1,6 @@
 #!/bin/bash
 
-exec > >(while IFS= read -r line; do echo "$(date) $line"; done | tee -a /var/log/custom/scriptoutputs.log) 2>&1
+exec > >(tee -a /var/log/custom/scriptoutputs.log) 2>&1
 
 echo "Starting the start.sh script..."
 
