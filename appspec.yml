@@ -12,5 +12,5 @@ hooks:
 
   AfterInstall:
     - location: scripts/check-deployment.sh
-      timeout: 10
+      timeout: 60
       runas: ubuntu
