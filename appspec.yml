@@ -5,6 +5,9 @@ hooks:
     - location: scripts/before-install.sh
       timeout: 60
       runas: ubuntu
+    - location: scripts/start.sh
+      timeout: 60
+      runas: ubuntu
   
   Install:
     - location: scripts/start.sh
