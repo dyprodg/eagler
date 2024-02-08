@@ -5,21 +5,79 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - echo "install"
+      - npm install
 
   pre_build:
     commands:
       - BUILD_STATUS=""
-
+      #Code Formating
+      - npx prettier --write .
+      #Code Linting
+      - npx eslint --fix .
+      #Code Testing
+      - npm test
       
+      #Stop Container if is still running from previous build
+      - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
+      - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
+
+
   build:
     commands:
-      - echo "Get .env for Docker Image testing"
+      #Get .envs for dockercontainer etc.
+      - |
+        SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
+        DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
+        NEXTAUTH_SECRET=$(echo $SECRETS | jq -r .NEXTAUTH_SECRET)
+        AWS_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_ACCESS_KEY)
+        AWS_SECRET_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_SECRET_ACCESS_KEY)
+        AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
+        AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
+        AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
+        DOCKER_PWD=$(echo $SECRETS | jq -r .DOCKER_PWD)
+        IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
+        IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
       
+      #Login to Docker in chase there where to my pull requests of alpine
+      - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
+
+      #Build Docker Image
+      - docker build -t myapp .
+      #Start Docker Container from Image
+      - >
+        docker run \
+          -e DATABASE_URL="$DATABASE_URL" \
+          -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
+          -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
+          -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+          -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
+          -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
+          -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
+          -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
+          -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
+          -p 80:3000 \
+          -d \
+          myapp
+      
+      #Get Docker ID vor healthcheck
+      - CONTAINER_ID=$(docker ps -l -q)
+
+      - sleep 10
+      # Run Healthcheck
+      - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
+      - echo "Health check passed"
+      - BUILD_STATUS="success"
+      - echo "Build and analysis completed"
 
   post_build:
     commands:
-      - echo "postbuild"
+      - |
+        if [ "$BUILD_STATUS" = "success" ]; then
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. You can create a pull request to main now"
+        else
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Building dev branch failed, please check buildlog!"
+        fi
+
 
 artifacts:
   files:
