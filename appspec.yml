@@ -4,13 +4,14 @@ hooks:
   BeforeInstall:
     - location: scripts/before-install.sh
       timeout: 10
+      runas: root
   
   Install:
     - location: scripts/start.sh
       timeout: 60
-      runas: ubuntu
+      runas: root
 
   AfterInstall:
     - location: scripts/check-deployment.sh
       timeout: 60
-      runas: ubuntu
+      runas: root
