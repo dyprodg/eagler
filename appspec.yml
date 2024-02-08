@@ -1,0 +1,16 @@
+version: 0.0
+os: linux
+hooks:
+  BeforeInstall:
+    - location: scripts/before-install.sh
+      timeout: 10
+  
+  Install:
+    - location: scripts/start.sh
+      timeout: 60
+      runas: ubuntu
+
+  AfterInstall:
+    - location: scripts/check-deployment.sh
+      timeout: 60
+      runas: ubuntu

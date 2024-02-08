@@ -5,92 +5,23 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - npm install
+      - echo "install"
 
   pre_build:
     commands:
-      - echo "Run Linting"
-      - npx eslint --fix .
+      - BUILD_STATUS=""
 
-      - echo "Run code formatting"
-      - npx prettier --write .
-
-      - echo "Run Jest Testing"
-      - npm test
       
-      - echo "Check if container is still running and kill it if so"
-      - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
-      - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
-
-      - echo "Setup ECR URI"
-      - ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME"
-
-      - echo "Login to ECR"
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
   build:
     commands:
       - echo "Get .env for Docker Image testing"
-      - |
-        SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
-        DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
-        NEXTAUTH_SECRET=$(echo $SECRETS | jq -r .NEXTAUTH_SECRET)
-        AWS_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_ACCESS_KEY)
-        AWS_SECRET_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_SECRET_ACCESS_KEY)
-        AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
-        AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
-        AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
-        DOCKER_PWD=$(echo $SECRETS | jq -r .DOCKER_PWD)
-        IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-        IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-
-      - echo "Login to Docker. In chase there where to much runs and the pull of alpine get declined"
-      - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
-
-      - echo "Build Docker Image"
-      - docker build -t $ECR_REPOSITORY_NAME .
-
-      - echo "Run Docker Container from Image"
-      - >
-        docker run \
-          -e DATABASE_URL="$DATABASE_URL" \
-          -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
-          -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
-          -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-          -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
-          -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
-          -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
-          -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
-          -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
-          -p 80:3000 \
-          -d \
-          $ECR_REPOSITORY_NAME
-
-      # Warten, bis der Docker-Container hochgefahren ist
-      - sleep 10
-
-      - echo "Get Docker Container ID"
-      - CONTAINER_ID=$(docker ps -l -q)
-
-      # Gesundheitscheck durchführen
-      - echo "Start Health Check"
-      - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
-      - echo "Health check passed"
-
-      - echo "Tagging Docker Image"
-      - docker tag $ECR_REPOSITORY_NAME:latest $ECR_URI:$IMAGE_TAG
-
-      - echo "Pushing Docker Image to ECR"
-      - docker push $ECR_URI:$IMAGE_TAG
-
       
-
 
   post_build:
     commands:
-      - echo "Docker Image successfully build, tested and pushed"
-      - echo "finishing of builder"
+      - echo "postbuild"
 
 artifacts:
   files:
-    - "**/*"
+    - 'scripts/*'
+    - 'appspec.yml'

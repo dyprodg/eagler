@@ -13,7 +13,7 @@ export default function Footer() {
   return (
     <div className={styles.footer}>
       <a className="hover:underline">Contact</a>
-      <a className="hover:underline">Impressum</a>
+      <a href="/impressum" className="hover:underline">Impressum</a>
       <a className="hover:underline">FAQ</a>
       <button onClick={handleLogout} className="hover:underline">
         Logout
