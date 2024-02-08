@@ -98,5 +98,4 @@ phases:
 
 artifacts:
   files:
-    - appspec.yml
-    - check-deployment.sh
+    - "**/*"
