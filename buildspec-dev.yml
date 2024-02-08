@@ -79,7 +79,3 @@ phases:
         fi
 
 
-
-artifacts:
-  files:
-    - "**/*"
