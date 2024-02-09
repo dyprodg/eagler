@@ -1,17 +1,13 @@
-# Base image
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+
+COPY package.json package-lock.json* ./
+RUN npm ci
+RUN npm install -g --arch=x64 --platform=linux --libc=glibc sharp@0.33.0-rc.2
 
 # Generate Prisma client
 FROM base AS prisma-generator
@@ -37,6 +33,9 @@ WORKDIR /app
 ENV NODE_ENV production
 # Uncomment if you want to disable telemetry
 # ENV NEXT_TELEMETRY_DISABLED 1
+
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/sharp ./node_modules/sharp
+ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
