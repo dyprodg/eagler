@@ -11,7 +11,10 @@ export default async function Register() {
   const session = await getServerSession(authOptions);
 
   // If a session exists, redirect the user to the '/timeline' page
-  if (session) redirect("/timeline");
+  if (session) {
+    redirect("/timeline");
+    return null;
+  } 
 
   // Render the registration page with components
   return (

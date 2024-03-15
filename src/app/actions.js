@@ -21,9 +21,26 @@ export async function deleteAccount(prevState, formData) {
   const usermail = formData.get("email");
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { email: usermail },
+    });
+
+    if (user) {
+      const userAuth = await prisma.userAuth.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (userAuth) {
+        await prisma.userAuth.delete({
+          where: { id: userAuth.id },
+        });
+      }
+    }
+
     await prisma.user.delete({
       where: { email: usermail },
     });
+
     return { message: "success" };
   } catch (error) {
     return { message: `User could not be deleted, ${error}` };
