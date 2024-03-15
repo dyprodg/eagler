@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import CheckMark from "@/app/components/loaders/checkMark";
 import RegistrationForm from "./RegistrationForm";
-import { signIn } from "next-auth/react";
 
 const Registration = () => {
   // Define state variables for username, email, password, message, and isSuccess
@@ -13,7 +11,6 @@ const Registration = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const router = useRouter();
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -36,24 +33,7 @@ const Registration = () => {
       // If registration is successful
       if (data.status === 201) {
         setIsSuccess(true);
-        // Call signin API after a delay
-        setTimeout(async () => {
-          try {
-            const res = await signIn("credentials", {
-              email,
-              password,
-              redirect: false,
-            });
-
-            if (res.error) {
-              setMessage("User email or password incorrect");
-              return;
-            }
-            router.push("/timeline");
-          } catch (error) {
-            console.error("Login error", error);
-          }
-        }, 2000);
+        setMessage("Registrierung erfolgreich. Bitte überprüfen Sie Ihre E-Mails und bestätigen Sie Ihre E-Mail-Adresse.");
       } else {
         // Registration error
         setMessage(data.message || "Error during registration");
@@ -71,7 +51,7 @@ const Registration = () => {
       <div className="flex flex-col bumpup w-[335px]">
         <h1 className="text-2xl text-center mt-5">Register</h1>
         {isSuccess ? (
-          <CheckMark />
+          <CheckMark message={message} />
         ) : (
           <RegistrationForm
             username={username}

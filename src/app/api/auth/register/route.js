@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 // Initialize a Prisma client
 const prisma = new PrismaClient();
@@ -36,7 +37,7 @@ export async function POST(req) {
     // Hash the provided password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const confirmationToken = Math.random().toString(36).substring(7);
+    const confirmationToken = crypto.randomBytes(16).toString('hex');
 
     // Create a new user in the database
     const user = await prisma.user.create({

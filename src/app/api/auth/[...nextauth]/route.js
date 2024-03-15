@@ -30,6 +30,7 @@ export const authOptions = {
           if (
             user &&
             user.auth &&
+            user.emailVerified &&
             (await bcrypt.compare(password, user.auth.password))
           ) {
             // Exclude the password and auth fields from the returned user object
