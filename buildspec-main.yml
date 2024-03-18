@@ -19,7 +19,7 @@ phases:
       # Stop Container if it is still running from a previous build
       - docker stop $(docker ps --filter "publish=80" -q) || true
 
-  build:
+  pre_build:
     commands:
       # Get .envs for Docker container
       - |
@@ -35,7 +35,7 @@ phases:
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
 
-  post_build:
+  build:
     commands:
       # Log in to Docker
       - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
