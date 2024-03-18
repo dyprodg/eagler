@@ -26,7 +26,7 @@ function formatTimestamp(timestamp) {
 
 export const Post = ({ post, session }) => {
   const [likes, setLikes] = useState(post.likes.length);
-  const [myLike, setMyLike] = useState(post.likes.some(like => like.userId === session.user.id));
+  const [myLike, setMyLike] = useState(post.likes.some(like => like.userId === session?.user?.id));
 
 
   const handleSetLike = async (postId) => { 

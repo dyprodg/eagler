@@ -72,7 +72,8 @@ const UploadForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex flex-col justify-center items-center">
+      <h1 className="mb-10 text-2xl font-bold"> Create Post</h1>
       <form className="bumpup px-6 py-4 w-[1000px]" onSubmit={handleSubmit}>
         {statusMessage && (
           <p className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 mb-4 rounded relative">
@@ -92,7 +93,7 @@ const UploadForm = () => {
           </div>
 
           <div className="flex flex-col gap-2 w-full justify-center ">
-            <div>{session?.user?.username}</div>
+            <div className="text-xl font-bold">{session?.user?.username}</div>
 
             <label className="w-full">
               <textarea

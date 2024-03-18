@@ -27,6 +27,7 @@ SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query 
 # Parse secrets and set environment variables
 DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
 NEXTAUTH_SECRET=$(echo $SECRETS | jq -r .NEXTAUTH_SECRET)
+NEXTAUTH_URL=$(echo $SECRETS | jq -r .NEXTAUTH_URL)
 AWS_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_ACCESS_KEY)
 AWS_SECRET_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_SECRET_ACCESS_KEY)
 AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
@@ -50,7 +51,7 @@ docker run \
   -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
   -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
   -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
-  -e NEXTAUTH_URL="https://www.justanothersocialmedia.net/" \
+  -e NEXTAUTH_URL="$NEXTAUTH_URL" \
   -e EMAIL="$EMAIL" \
   -e EMAIL_PASSWORD="$EMAIL_PASSWORD" \
   -p 80:3000 \
