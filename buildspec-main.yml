@@ -10,21 +10,20 @@ phases:
   pre_build:
     commands:
       - BUILD_STATUS=""
-      #Code Formating
+      # Code Formating
       - npx prettier --write .
-      #Code Linting
+      # Code Linting
       - npx eslint --fix .
-      #Code Testing
+      # Code Testing
       - npm test
       
-      #Stop Container if is still running from previous build
+      # Stop Container if it is still running from a previous build
       - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
       - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
 
-
   build:
     commands:
-      #Get .envs for dockercontainer etc.
+      # Get .envs for dockercontainer etc.
       - |
         SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
         DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
@@ -37,14 +36,16 @@ phases:
         DOCKER_PWD=$(echo $SECRETS | jq -r .DOCKER_PWD)
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
-      
-      #Login to Docker in chase there where to my pull requests of alpine
+
+  post_build:
+    commands:
+      # Log in to Docker in case there were any pull requests of Alpine
       - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
 
-      #Build Docker Image
+      # Build Docker Image
       - docker build --no-cache --force-rm -t myapp .
 
-      #Start Docker Container from Image
+      # Start Docker Container from Image
       - >
         docker run \
           -e DATABASE_URL="$DATABASE_URL" \
@@ -60,20 +61,44 @@ phases:
           -d \
           myapp
       
-      #Get Docker ID vor healthcheck
+      # Get Docker ID for health check
       - CONTAINER_ID=$(docker ps -l -q)
-
       - sleep 10
+      
       # Run Healthcheck
       - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
       - echo "Health check passed"
       - echo "Build and analysis completed"
-      - docker tag myapp:latest 283919506801.dkr.ecr.eu-central-1.amazonaws.com/eagler-docker:latest
-      # Push the image to ECR
-      - docker push 283919506801.dkr.ecr.eu-central-1.amazonaws.com/eagler-docker:latest
-      - echo "Image pushed to ECR"
-      - BUILD_STATUS="success"
 
+      # Push Docker image to ECR
+      - |
+        AWS_REGION="eu-central-1"
+        ECR_REPOSITORY_NAME="eagler-docker"
+        IMAGE_TAG="latest"
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+        ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME"
+
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+        if [ $? -ne 0 ]; then
+          echo "Error logging into ECR."
+          exit 1
+        fi
+
+        docker tag myapp:latest $ECR_URI:$IMAGE_TAG
+        if [ $? -ne 0 ]; then
+          echo "Error tagging Docker image."
+          exit 1
+        fi
+
+        docker push $ECR_URI:$IMAGE_TAG
+        if [ $? -ne 0 ]; then
+          echo "Error pushing Docker image to ECR."
+          exit 1
+        fi
+
+        echo "Image pushed to ECR"
+
+      - BUILD_STATUS="success"
 
   post_build:
     commands:
@@ -83,7 +108,6 @@ phases:
         else
           aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Release Failed"
         fi
-
 
 artifacts:
   files:
