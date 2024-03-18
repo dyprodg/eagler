@@ -10,20 +10,18 @@ phases:
   pre_build:
     commands:
       - BUILD_STATUS=""
-      # Code Formating
+
+      # Code Formatting, Linting, and Testing
       - npx prettier --write .
-      # Code Linting
       - npx eslint --fix .
-      # Code Testing
       - npm test
       
       # Stop Container if it is still running from a previous build
-      - CONTAINER_ID=$(docker ps --filter "publish=80" -q)
-      - if [ ! -z "$CONTAINER_ID" ]; then docker stop ${CONTAINER_ID}; docker rm ${CONTAINER_ID}; fi
+      - docker stop $(docker ps --filter "publish=80" -q) || true
 
   build:
     commands:
-      # Get .envs for dockercontainer etc.
+      # Get .envs for Docker container
       - |
         SECRETS=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query SecretString --output text)
         DATABASE_URL=$(echo $SECRETS | jq -r .DATABASE_URL)
@@ -39,27 +37,23 @@ phases:
 
   post_build:
     commands:
-      # Log in to Docker in case there were any pull requests of Alpine
+      # Log in to Docker
       - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
 
       # Build Docker Image
       - docker build --no-cache --force-rm -t myapp .
 
       # Start Docker Container from Image
-      - >
-        docker run \
-          -e DATABASE_URL="$DATABASE_URL" \
-          -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
-          -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
-          -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-          -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
-          -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
-          -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
-          -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
-          -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
-          -p 80:3000 \
-          -d \
-          myapp
+      - docker run -e DATABASE_URL="$DATABASE_URL" \
+                   -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
+                   -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
+                   -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+                   -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
+                   -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
+                   -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
+                   -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
+                   -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
+                   -p 80:3000 -d myapp
       
       # Get Docker ID for health check
       - CONTAINER_ID=$(docker ps -l -q)
@@ -78,36 +72,16 @@ phases:
         AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
         ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME"
 
-        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-        if [ $? -ne 0 ]; then
-          echo "Error logging into ECR."
-          exit 1
-        fi
-
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URI
         docker tag myapp:latest $ECR_URI:$IMAGE_TAG
-        if [ $? -ne 0 ]; then
-          echo "Error tagging Docker image."
-          exit 1
-        fi
-
         docker push $ECR_URI:$IMAGE_TAG
-        if [ $? -ne 0 ]; then
-          echo "Error pushing Docker image to ECR."
-          exit 1
-        fi
-
         echo "Image pushed to ECR"
-
-      - BUILD_STATUS="success"
+        BUILD_STATUS="success"
 
   post_build:
     commands:
-      - |
-        if [ "$BUILD_STATUS" = "success" ]; then
-          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Release Successfull"
-        else
-          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Release Failed"
-        fi
+      # Notify build status
+      - aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "$(if [ "$BUILD_STATUS" = "success" ]; then echo 'Release Successful'; else echo 'Release Failed'; fi)"
 
 artifacts:
   files:
