@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 const prisma = new PrismaClient();
 
 export async function GET(req, res) {
@@ -18,7 +19,7 @@ export async function GET(req, res) {
           where: { id: user.id },
           data: { emailVerifiedToken: null, emailVerified: true },
         });
-        return NextResponse.json({ message: 'user verified'});
+        return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/email-verified`);
       } else {
         return NextResponse.json({ message: 'token not found' });
       }
@@ -26,7 +27,7 @@ export async function GET(req, res) {
       return NextResponse.json({ message: 'token not provided' });
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error("An error occurred on email verification:", error);
     return NextResponse.json({ status: 500, error: error.message });
   }
 };
