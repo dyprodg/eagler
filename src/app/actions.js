@@ -199,3 +199,33 @@ export async function deletePost(session, post) {
     return { failure: error.message };
   }
 }
+
+export async function setLike(session, post) {
+  try {
+    const like = await prisma.like.findFirst({
+      where: {
+        userId: session.user.id,
+        postId: post.id,
+      },
+    });
+
+    if (like) {
+      await prisma.like.delete({
+        where: {
+          id: like.id,
+        },
+      });
+      return { success: "Like removed" };
+    } else {
+      await prisma.like.create({
+        data: {
+          userId: session.user.id,
+          postId: post.id,
+        },
+      });
+      return { success: "Like added" };
+    }
+  } catch (error) {
+    return { failure: `Error setting like ${error}` };
+  }
+}

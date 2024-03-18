@@ -88,7 +88,7 @@ const Timeline = () => {
         <div className="flex w-full h-screen flex-col items-center">
           <div className="p-4 space-y-4">
             {posts.map((post) => (
-              <Post className="" key={post.id} post={post} />
+              <Post className="" key={post.id} post={post} session={session}/>
             ))}
             <div className="w-full justify-center" ref={loaderRef}>
               <SpinnerLoader />
