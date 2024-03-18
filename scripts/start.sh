@@ -32,6 +32,8 @@ AWS_SECRET_ACCESS_KEY=$(echo $SECRETS | jq -r .AWS_SECRET_ACCESS_KEY)
 AWS_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_BUCKET_NAME)
 AWS_BUCKET_REGION=$(echo $SECRETS | jq -r .AWS_BUCKET_REGION)
 AWS_STORAGE_BUCKET_NAME=$(echo $SECRETS | jq -r .AWS_STORAGE_BUCKET_NAME)
+EMAIL=$(echo $SECRETS | jq -r .EMAIL)
+EMAIL_PASSWORD=$(echo $SECRETS | jq -r .EMAIL_PASSWORD)
 
 # Calculate URLs
 IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
@@ -49,6 +51,8 @@ docker run \
   -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
   -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
   -e NEXTAUTH_URL="https://www.justanothersocialmedia.net/" \
+  -e EMAIL="$EMAIL" \
+  -e EMAIL_PASSWORD="$EMAIL_PASSWORD" \
   -p 80:3000 \
   --log-driver=awslogs \
   --log-opt awslogs-region=eu-central-1 \

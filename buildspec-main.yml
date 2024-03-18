@@ -19,7 +19,7 @@ phases:
       # Stop Container if it is still running from a previous build
       - docker stop $(docker ps --filter "publish=80" -q) || true
 
-  pre_build:
+  build:
     commands:
       # Get .envs for Docker container
       - |
@@ -35,8 +35,6 @@ phases:
         IMAGE_UPLOAD_URL="http://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
         IMAGE_STORAGE_URL="http://${AWS_STORAGE_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/"
 
-  build:
-    commands:
       # Log in to Docker
       - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
 
@@ -44,16 +42,20 @@ phases:
       - docker build --no-cache --force-rm -t myapp .
 
       # Start Docker Container from Image
-      - docker run -e DATABASE_URL="$DATABASE_URL" \
-                   -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
-                   -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
-                   -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-                   -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
-                   -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
-                   -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
-                   -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
-                   -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
-                   -p 80:3000 -d myapp
+      - >
+        docker run \
+          -e DATABASE_URL="$DATABASE_URL" \
+          -e NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
+          -e AWS_ACCESS_KEY="$AWS_ACCESS_KEY" \
+          -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+          -e AWS_BUCKET_NAME="$AWS_BUCKET_NAME" \
+          -e AWS_BUCKET_REGION="$AWS_BUCKET_REGION" \
+          -e AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
+          -e IMAGE_UPLOAD_URL="$IMAGE_UPLOAD_URL" \
+          -e IMAGE_STORAGE_URL="$IMAGE_STORAGE_URL" \
+          -p 80:3000 \
+          -d \
+          myapp
       
       # Get Docker ID for health check
       - CONTAINER_ID=$(docker ps -l -q)
@@ -66,13 +68,12 @@ phases:
 
       # Push Docker image to ECR
       - |
-        AWS_REGION="eu-central-1"
         ECR_REPOSITORY_NAME="eagler-docker"
         IMAGE_TAG="latest"
         AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-        ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME"
+        ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_BUCKET_REGION.amazonaws.com/$ECR_REPOSITORY_NAME"
 
-        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URI
+        aws ecr get-login-password --region $AWS_BUCKET_REGION | docker login --username AWS --password-stdin $ECR_URI
         docker tag myapp:latest $ECR_URI:$IMAGE_TAG
         docker push $ECR_URI:$IMAGE_TAG
         echo "Image pushed to ECR"
