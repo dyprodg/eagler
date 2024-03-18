@@ -1,37 +1,32 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
-export const GET = async(req) => {
-  const url = new URL(req.url);
-  const token = new URLSearchParams(url.searchParams).get('token');
-
+export async function GET(req, res) {
   try {
-    const user = await prisma.user.findFirst({
-      where: {
-        emailVerifiedToken: token,
-      },
-    });
-    if(!user) {
-      return NextResponse.rewrite('/404').status(404).text("Token not found");
+    const url = new URL(req.url);
+    const token = url.searchParams.get("token");
+
+    if (token) {
+      const user = await prisma.user.findFirst({
+        where: { emailVerifiedToken: token },
+      });
+
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { emailVerifiedToken: null, emailVerified: true },
+        });
+        return NextResponse.json({ message: 'user verified'});
+      } else {
+        return NextResponse.json({ message: 'token not found' });
+      }
+    } else {
+      return NextResponse.json({ message: 'token not provided' });
     }
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        emailVerifiedToken: null,
-        emailVerified: true,
-      },
-    });
-
-    return NextResponse.redirect("/email-verified");
-
-  } catch (error) { 
-    console.log(error);
-    return NextResponse.redirect('/error');
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return NextResponse.json({ status: 500, error: error.message });
   }
-
 };

@@ -37,7 +37,7 @@ export async function POST(req) {
     // Hash the provided password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const confirmationToken = crypto.randomBytes(16).toString('hex');
+    const confirmationToken = crypto.randomBytes(64).toString('hex');
 
     // Create a new user in the database
     const user = await prisma.user.create({

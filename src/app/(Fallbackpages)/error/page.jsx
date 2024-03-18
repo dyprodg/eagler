@@ -8,4 +8,4 @@ const ErrorPage = () => {
     );
 };
 
-export default EmailVerifiedPage;
+export default ErrorPage;
