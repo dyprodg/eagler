@@ -7,6 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
+import { revalidatePath } from "next/cache";
 
 const s3Client = new S3Client({
   region: process.env.AWS_BUCKET_REGION,
@@ -182,16 +183,17 @@ export async function deletePost(session, post) {
 
       // Prepare the delete parameters
       const deleteParams = {
-        Bucket: process.env.AWS_BUCKET_NAME,
+        Bucket: process.env.AWS_STORAGE_BUCKET_NAME,
         Key: key,
       };
 
       // Delete the image from S3 using DeleteObjectCommand
       await s3Client.send(new DeleteObjectCommand(deleteParams));
 
+      revalidatePath("/profile");
       return { success: "Post deleted successfully" };
     } else {
-      throw new Error("Unauthorized to delete this post");
+      return { failure: `You are not authorized to delete this post ${error}` };
     }
   } catch (error) {
     return { failure: error.message };
