@@ -56,7 +56,6 @@ const UploadForm = () => {
         return;
       }
       const { url } = signedURLResult.success;
-      console.log({ url });
       await fetch(url, {
         method: "PUT",
         headers: {
@@ -72,9 +71,9 @@ const UploadForm = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <h1 className="mb-10 text-2xl font-bold"> Create Post</h1>
+    <div className="flex justify-center items-center">
       <form className="bumpup px-6 py-4 w-[1000px]" onSubmit={handleSubmit}>
+      <h1 className="mb-10 text-2xl font-bold text-center"> Create Post</h1>
         {statusMessage && (
           <p className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 mb-4 rounded relative">
             {statusMessage}
@@ -108,12 +107,12 @@ const UploadForm = () => {
             </label>
             <div className="flex w-full justify-center items-center">
               {previewUrl && file && (
-                <div className="mt-4 max-w-[500px]">
+                <div className="mt-4 max-w-[500px] max-h-[500px]">
                   <Image 
                     src={previewUrl} 
                     alt="Selected file" 
-                    width={500}  // Set the desired width
-                    height={300} // Set the desired height
+                    width={300}
+                    height={300}
                     className=""
                   />
                 </div>
