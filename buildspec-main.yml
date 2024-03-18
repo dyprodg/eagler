@@ -42,7 +42,8 @@ phases:
       - echo "$DOCKER_PWD" | docker login --username dyprod --password-stdin
 
       #Build Docker Image
-      - docker build -t myapp .
+      - docker build --no-cache --force-rm -t myapp .
+
       #Start Docker Container from Image
       - >
         docker run \
