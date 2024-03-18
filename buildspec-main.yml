@@ -67,16 +67,21 @@ phases:
       # Run Healthcheck
       - docker inspect myapp | grep IPAddress | awk '{print $2}' | tr -d '",' | xargs -I {} curl http://{}:80 || exit 1
       - echo "Health check passed"
-      - BUILD_STATUS="success"
       - echo "Build and analysis completed"
+      - docker tag myapp:latest 283919506801.dkr.ecr.eu-central-1.amazonaws.com/eagler-docker:latest
+      # Push the image to ECR
+      - docker push 283919506801.dkr.ecr.eu-central-1.amazonaws.com/eagler-docker:latest
+      - echo "Image pushed to ECR"
+      - BUILD_STATUS="success"
+
 
   post_build:
     commands:
       - |
         if [ "$BUILD_STATUS" = "success" ]; then
-          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Build success for Dev Branch. You can create a pull request to main now"
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Release Successfull"
         else
-          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Building dev branch failed, please check buildlog!"
+          aws sns publish --topic-arn arn:aws:sns:eu-central-1:283919506801:eagler-pipepline --message "Release Failed"
         fi
 
 
