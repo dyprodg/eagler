@@ -7,6 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
+import { revalidatePath } from "next/cache";
 
 const s3Client = new S3Client({
   region: process.env.AWS_BUCKET_REGION,
@@ -21,9 +22,26 @@ export async function deleteAccount(prevState, formData) {
   const usermail = formData.get("email");
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { email: usermail },
+    });
+
+    if (user) {
+      const userAuth = await prisma.userAuth.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (userAuth) {
+        await prisma.userAuth.delete({
+          where: { id: userAuth.id },
+        });
+      }
+    }
+
     await prisma.user.delete({
       where: { email: usermail },
     });
+
     return { message: "success" };
   } catch (error) {
     return { message: `User could not be deleted, ${error}` };
@@ -165,18 +183,49 @@ export async function deletePost(session, post) {
 
       // Prepare the delete parameters
       const deleteParams = {
-        Bucket: process.env.AWS_BUCKET_NAME,
+        Bucket: process.env.AWS_STORAGE_BUCKET_NAME,
         Key: key,
       };
 
       // Delete the image from S3 using DeleteObjectCommand
       await s3Client.send(new DeleteObjectCommand(deleteParams));
 
+      revalidatePath("/profile");
       return { success: "Post deleted successfully" };
     } else {
-      throw new Error("Unauthorized to delete this post");
+      return { failure: `You are not authorized to delete this post ${error}` };
     }
   } catch (error) {
     return { failure: error.message };
+  }
+}
+
+export async function setLike(session, post) {
+  try {
+    const like = await prisma.like.findFirst({
+      where: {
+        userId: session.user.id,
+        postId: post.id,
+      },
+    });
+
+    if (like) {
+      await prisma.like.delete({
+        where: {
+          id: like.id,
+        },
+      });
+      return { success: "Like removed" };
+    } else {
+      await prisma.like.create({
+        data: {
+          userId: session.user.id,
+          postId: post.id,
+        },
+      });
+      return { success: "Like added" };
+    }
+  } catch (error) {
+    return { failure: `Error setting like ${error}` };
   }
 }

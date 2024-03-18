@@ -22,18 +22,21 @@ const DeleteAccountPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    if (session === undefined) {
+      // session is still loading, do nothing
+      return;
+    }
     if (!session) {
       redirect("/");
     }
   }, [session, router]);
-
 
   //redirect and logout after successfull user deletion
   useEffect(() => {
     let timer;
     if (state.message === "success") {
       timer = setTimeout(async () => {
-        await signOut({ redirect: false });
+        await signOut({ callbackUrl: `${window.location.origin}/` });
       }, 2000);
     }
 

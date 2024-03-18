@@ -84,11 +84,11 @@ const Timeline = () => {
 
   return (
     <div>
-      <div className="max-w-[90%] md:mx-32 ml-12">
-        <div className="flex w-full h-screen flex-col">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      <div className="max-w-[90%] md:max-w-[90%] lg:max-w-[70%] xl:max-w-[50%] 2xl:max-w-[40%] mx-auto">
+        <div className="flex w-full h-screen flex-col items-center">
+          <div className="p-4 space-y-4">
             {posts.map((post) => (
-              <Post key={post.id} post={post} />
+              <Post className="" key={post.id} post={post} session={session}/>
             ))}
             <div className="w-full justify-center" ref={loaderRef}>
               <SpinnerLoader />

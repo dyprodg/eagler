@@ -1,14 +1,11 @@
 "use client";
 import { signOut } from "next-auth/react";
 import styles from "./style.module.scss";
-import { useRouter } from "next/navigation";
 
 export default function Footer() {
-  const router = useRouter();
 
   const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push("/");
+    await signOut({ callbackUrl: `${window.location.origin}/`});
   };
   return (
     <div className={styles.footer}>

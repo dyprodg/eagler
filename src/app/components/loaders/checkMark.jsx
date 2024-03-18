@@ -1,6 +1,6 @@
 import React from "react";
 
-const CheckMark = () => {
+const CheckMark = ({message}) => {
   return (
     <div className="mt-8 m-8 flex flex-col items-center justify-center">
       {/* SVG element for rendering a checkmark */}
@@ -32,6 +32,8 @@ const CheckMark = () => {
           points="100.2,40.2 51.5,88.8 29.8,67.5 "
         />
       </svg>
+      <p className="mt-4 text-center">{message}</p>
+      
     </div>
   );
 };
