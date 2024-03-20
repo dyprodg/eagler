@@ -1,6 +1,6 @@
 
 
-const page = () => {
+const Impressum = () => {
 
 
   return (
@@ -11,4 +11,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Impressum;
