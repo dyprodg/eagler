@@ -9,7 +9,7 @@ const EmailVerifiedPage = () => {
 
     useEffect(() => {
       const timer = setTimeout(() => {
-        router.push(process.env.NEXTAUTH_URL);
+        router.push("/");
       }, 3000);
   
       // Cleanup function to clear the timer if the component unmounts before the redirect happens
