@@ -67,7 +67,7 @@ export async function POST(req) {
       from: process.env.EMAIL,
       to: email,
       subject: "Email Verification",
-      text: `Please verify your email by clicking on the link: ${process.env.NEXTAUTH_URL}/api/auth/confirm-email?token=${confirmationToken}`
+      text: `Please verify your email by clicking on the link: https://nlg6614mrd.execute-api.eu-central-1.amazonaws.com/prod/verify?token=${confirmationToken}`
     }
 
     // Send the email
