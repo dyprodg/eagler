@@ -69,7 +69,16 @@ const LoginForm = () => {
           <button className="bn13 self-center" type="submit">
             Login
           </button>
-          {message && <div className="text-xs p-2 text-red-600">{message}</div>}
+          {message && <div className="text-xs p-2">
+            <div>
+                <a className="text-red-600">{message}</a>
+            </div>
+              <div>
+                  <a href="/reset-password" className="underline">Forgot Password?</a>
+              </div>
+            </div>
+          }
+         
         </form>
       </div>
     </div>

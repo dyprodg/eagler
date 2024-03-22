@@ -25,7 +25,7 @@ const Settings = () => {
         <p>Username: {session?.user?.username}</p>
         <p>User ID: {session?.user?.id}</p>
         <p>Email: {session?.user?.email}</p>
-        <div>
+        <div className="mt-7">
           <a className="button-28" href="/deleteaccount">
             Delete Account
           </a>

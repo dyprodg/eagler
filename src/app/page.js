@@ -5,6 +5,7 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import RegisterButton from "./components/RegisterButton";
 import Image from "next/image";
 
+
 // Define an async function named 'Register'
 export default async function Register() {
   // Fetch the user session from the server using 'getServerSession'
@@ -21,6 +22,7 @@ export default async function Register() {
     <div className="relative">
       <div className="fixed w-full flex justify-between items-center">
         {/* Render the 'RegisterButton' component */}
+
         <Image
           className="m-5 hidden md:flex"
           src="/eagler.svg"
@@ -29,6 +31,7 @@ export default async function Register() {
           height={50}
           priority
         />
+
         <RegisterButton />
       </div>
       <div className="fixed top-0 left-0"></div>

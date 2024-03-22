@@ -1,12 +1,9 @@
-
-
 const Impressum = () => {
 
 
   return (
     <div className="flex w-full h-screen justify-center items-start">
-      <h1 className="text-5xl">Impressum</h1>
-      <div className="text-2xl"></div>
+      <h1 className="text-3xl mt-16">Impressum</h1>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { getSignedURL } from "../actions";
+import { useRouter } from "next/navigation";
 
 const UploadForm = () => {
   const { data: session } = useSession();
@@ -12,6 +13,7 @@ const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const router = useRouter();
 
   const buttonDisabled = content.length < 1 || loading;
 
@@ -53,6 +55,7 @@ const UploadForm = () => {
       });
       if (signedURLResult.failure !== undefined) {
         console.error(signedURLResult.failure);
+        setStatusMessage(signedURLResult.failure);
         return;
       }
       const { url } = signedURLResult.success;
@@ -68,6 +71,8 @@ const UploadForm = () => {
     setLoading(false);
     setContent("");
     setFile(null);
+    //setPreviewUrl(null);
+    router.push("/timeline");
   };
 
   return (

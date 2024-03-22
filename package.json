@@ -21,6 +21,7 @@
     "crypto": "^1.0.1",
     "framer-motion": "^10.17.12",
     "gsap": "^3.12.4",
+    "msw": "^2.2.10",
     "next": "14.0.4",
     "next-auth": "^4.24.5",
     "nodemailer": "^6.9.12",

@@ -29,7 +29,6 @@ const Registration = () => {
       });
 
       const data = await response.json();
-      console.log(response, data);
       // If registration is successful
       if (data.status === 201) {
         setIsSuccess(true);

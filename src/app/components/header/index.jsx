@@ -5,10 +5,12 @@ import Nav from "./nav";
 import { AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isActive, setIsActive] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     if (isActive) setIsActive(false);
@@ -18,6 +20,11 @@ export default function Header() {
     <>
       <div className="border">
         <div className={styles.header}>
+          <div
+            onClick={() => {
+              router.push("/");
+            }}
+          >
           <Image
             className="m-5 hidden md:flex"
             src="/eagler.svg"
@@ -26,6 +33,7 @@ export default function Header() {
             height={50}
             priority
           />
+          </div>
           <div
             onClick={() => {
               setIsActive(!isActive);
