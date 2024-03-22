@@ -67,9 +67,9 @@ export const Post = ({ post, session }) => {
         </button>
         <button className="flex justify-center items-center" onClick={() => setIsModalOpen(true)}>
           <FaRegComment className="mx-2 hover:scale-110" />
-          {`${post.comments}`}
+          {`${post.comments.length}`}
         </button>
-        <CommentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <CommentModal session={session} post={post} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
     </div>
   );

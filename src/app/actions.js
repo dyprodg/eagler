@@ -116,7 +116,11 @@ export async function getLatestPosts(lastPostId) {
       include: {
         user: true,
         likes: true,
-        comments: true,
+        comments: {
+          include: {
+            CommentLike: true,
+          }
+        }
       },
     };
 
@@ -221,6 +225,102 @@ export async function setLike(session, post) {
         data: {
           userId: session.user.id,
           postId: post.id,
+        },
+      });
+      return { success: "Like added" };
+    }
+  } catch (error) {
+    return { failure: `Error setting like ${error}` };
+  }
+}
+
+export async function addComment(session, post, text) {
+  try {
+    await prisma.comment.create({
+      data: {
+        userId: session.user.id,
+        postId: post.id,
+        content: text,
+      },
+    });
+    return { success: "Comment added" };
+  } catch (error) {
+    return { failure: `Error adding comment ${error}` };
+  }
+}
+
+export async function deleteComment(session, comment) {
+  try {
+    const foundComment = await prisma.comment.findUnique({
+      where: { id: comment.id },
+    });
+
+    if (!foundComment) {
+      throw new Error("Comment not found");
+    }
+
+    if (session.user.id === foundComment.userId) {
+      await prisma.comment.delete({
+        where: { id: comment.id },
+      });
+
+      return { success: "Comment deleted" };
+    } else {
+      return { failure: `You are not authorized to delete this comment ${error}` };
+    }
+  } catch (error) {
+    return { failure: error.message };
+  }
+}
+
+export async function changeComment(session, comment, text) {
+  try {
+    const foundComment = await prisma.comment.findUnique({
+      where: { id: comment.id },
+    });
+
+    if (!foundComment) {
+      throw new Error("Comment not found");
+    }
+
+    if (session.user.id === foundComment.userId) {
+      await prisma.comment.update({
+        where: { id: comment.id },
+        data: {
+          content: text,
+        },
+      });
+
+      return { success: "Comment changed" };
+    } else {
+      return { failure: `You are not authorized to change this comment ${error}` };
+    }
+  } catch (error) {
+    return { failure: error.message };
+  }
+}
+
+export async function setCommentLike(session, comment) {
+  try {
+    const like = await prisma.commentLike.findFirst({
+      where: {
+        userId: session.user.id,
+        commentId: comment.id,
+      },
+    });
+
+    if (like) {
+      await prisma.commentLike.delete({
+        where: {
+          id: like.id,
+        },
+      });
+      return { success: "Like removed" };
+    } else {
+      await prisma.commentLike.create({
+        data: {
+          userId: session.user.id,
+          commentId: comment.id,
         },
       });
       return { success: "Like added" };
