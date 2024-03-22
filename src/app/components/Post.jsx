@@ -5,6 +5,7 @@ import { FaRegComment } from "react-icons/fa";
 import Image from "next/image";
 import { setLike } from "@/app/actions";
 import { useState } from "react";
+import CommentModal from "./CommentModal";
 
 function formatTimestamp(timestamp) {
   const now = Date.now();
@@ -27,6 +28,7 @@ function formatTimestamp(timestamp) {
 export const Post = ({ post, session }) => {
   const [likes, setLikes] = useState(post.likes.length);
   const [myLike, setMyLike] = useState(post.likes.some(like => like.userId === session?.user?.id));
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
 
   const handleSetLike = async (postId) => { 
@@ -63,10 +65,11 @@ export const Post = ({ post, session }) => {
           <BiLike className="mx-2 hover:scale-110" />
           {`${likes}`}
         </button>
-        <button className="flex justify-center items-center">
+        <button className="flex justify-center items-center" onClick={() => setIsModalOpen(true)}>
           <FaRegComment className="mx-2 hover:scale-110" />
           {`${post.comments}`}
         </button>
+        <CommentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
     </div>
   );

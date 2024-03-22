@@ -5,8 +5,8 @@ import { AuthProviders } from "./Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Next-Auth Postgres",
-  description: "Postgres Next.js Next-Auth Template",
+  title: "Just Another Social Media",
+  description: "This is a social media app built with Next.js and Postgres.",
 };
 
 export default function RootLayout({ children }) {
