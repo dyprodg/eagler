@@ -118,7 +118,9 @@ export async function getLatestPosts(lastPostId) {
         likes: true,
         comments: {
           include: {
+            user: true,
             CommentLike: true,
+
           }
         }
       },

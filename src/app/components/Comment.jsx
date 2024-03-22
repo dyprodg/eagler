@@ -40,7 +40,8 @@ const Comment = ({ comment, session, onDeleteComment }) => {
 
     return (
         <div className="flex flex-col justify-between items-start border-b-2 px-2 py-1 w-[400px] border rounded-lg border-gray-500">
-            <div className='flex w-full justify-end'>
+            <div className='flex w-full justify-between'>
+            <p className='font-bold'>{comment?.user?.username}</p>
                 {session?.user?.id === comment?.userId && 
                     <button className='text-xs hover:text-red-600' onClick={handleDelete}>
                         <TiDeleteOutline size={20}/>
