@@ -109,7 +109,9 @@ const UploadForm = () => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
+              
             </label>
+            <div className="text-sm text-gray-500">{content.length}/200</div>
             <div className="flex w-full justify-center items-center">
               {previewUrl && file && (
                 <div className="mt-4 max-w-[500px] max-h-[500px]">
