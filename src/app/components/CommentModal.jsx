@@ -5,10 +5,11 @@ import { addComment, deleteComment } from '@/app/actions';
 import  Comment  from '@/app/components/Comment';
 
 const CommentModal = ({ isOpen, onClose, post, session }) => {
-    if (!isOpen) return null;
+    
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState(post?.comments || []);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false)
+    if (!isOpen) return null;
 
     const handleInputChange = (e) => {
         setComment(e.target.value);
