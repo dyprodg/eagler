@@ -1,4 +1,3 @@
-
 const LegalCheck = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
@@ -9,11 +8,11 @@ const LegalCheck = ({ isOpen, onClose }) => {
                 <div className="w-full h-full flex flex-col justify-center">
                     <div class="container mx-auto py-8 text-xs">
                             <h1 class="text-xl font-semibold mb-4">Terms and Conditions (AGB)</h1>
-                            <p class="text-gray-700 mb-4">This website ("Eagler") justanothersocialmedia.net is provided for educational purposes and as a non-profit project. By
+                            <p class="text-gray-700 mb-4">This website (&quot;Eagler&quot;) justanothersocialmedia.net is provided for educational purposes and as a non-profit project. By
                                 accessing or using this website, you agree to these terms and conditions:</p>
 
                             <ul class="list-disc pl-8 mb-4">
-                                <li>This website is provided "as is" and without warranty of any kind, express or implied.</li>
+                                <li>This website is provided &quot;as is&quot; and without warranty of any kind, express or implied.</li>
                                 <li>The owner of this website (Dennis Diepolder) does not take any responsibility for the accuracy, completeness, or
                                     suitability of the information and materials found or offered on this website.</li>
                                 <li>Use of any information or materials on this website is entirely at your own risk.</li>
