@@ -59,14 +59,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-full flex flex-col m-4 mt-24 justify-center items-center">
+    <div className="w-full flex flex-col mt-24 justify-center items-center">
       <h1 className="text-2xl font-bold">{session?.user?.username} Profile</h1>
       <div className="max-w-[90%]">
         {error && <p>{error}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           {posts.map((post) => (
             <div key={post.id}>
-              <Post post={post} />
+              <Post post={post} session={session}/>
               <button
                 className="border border-black rounded-full py-1 px-4 m-1 hover:scale-105 active:bg-red-600 transition ease-in-out"
                 onClick={() => handleDeletePost(post)}

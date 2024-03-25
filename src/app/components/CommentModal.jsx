@@ -50,7 +50,7 @@ const CommentModal = ({ isOpen, onClose, post, session }) => {
 
     return (
         <div className="modal-background" onClick={onClose}>
-            <div className="modal-content border rounded-xl bg-slate-600 bumpup p-8" onClick={e => e.stopPropagation()}>
+            <div className="modal-content border rounded-xl bg-slate-600 bumpup p-8 m-4" onClick={e => e.stopPropagation()}>
                 <button className="close-button" onClick={onClose}>X</button>
                 <div className="w-full h-full flex flex-col justify-center">
                     <div className="flex max-w-full h-1/3">

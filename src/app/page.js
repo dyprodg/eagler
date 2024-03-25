@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import RegisterButton from "./components/RegisterButton";
 import Image from "next/image";
+import CookieBanner from "./components/CookieMenu";
 
 
 // Define an async function named 'Register'
@@ -20,6 +21,7 @@ export default async function Register() {
   // Render the registration page with components
   return (
     <div className="relative">
+      <CookieBanner />
       <div className="fixed w-full flex justify-between items-center">
         {/* Render the 'RegisterButton' component */}
 

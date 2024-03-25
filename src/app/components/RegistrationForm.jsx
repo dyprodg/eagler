@@ -1,4 +1,6 @@
+
 import Link from "next/link";
+
 
 const RegistrationForm = ({
   username,
@@ -9,6 +11,9 @@ const RegistrationForm = ({
   setPassword,
   handleSubmit,
   message,
+  handleTermsClick,
+  terms,
+  setTerms,
 }) => {
   return (
     <div>
@@ -48,6 +53,17 @@ const RegistrationForm = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+        </label>
+        <label className="flex items-start mb-4">
+          <input
+            required
+            className="mr-2"
+            type="checkbox"
+            name="terms"
+            value={terms}
+            onChange={(e) => setTerms(e.target.checked)}
+          />
+          <span>I accept the <a  className="underline" href="/impressum" onClick={handleTermsClick}>terms and conditions</a></span>
         </label>
         <button className="bn13 self-center" type="submit">
           Register
