@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CheckMark from "@/app/components/loaders/checkMark";
 import RegistrationForm from "./RegistrationForm";
+import LegalCheck from "./LegalCheck";
 
 const Registration = () => {
   // Define state variables for username, email, password, message, and isSuccess
@@ -11,6 +12,14 @@ const Registration = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [terms, setTerms] = useState(false);
+  const [isLegalCheckOpen, setIsLegalCheckOpen] = useState(false);
+  
+
+  const handleTermsClick = (e) => {
+    e.preventDefault();
+    setIsLegalCheckOpen(true); // Set isLegalCheckOpen to true when the terms are clicked
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -61,9 +70,13 @@ const Registration = () => {
             setPassword={setPassword}
             handleSubmit={handleSubmit}
             message={message}
+            handleTermsClick={handleTermsClick}
+            terms={terms}
+            setTerms={setTerms}
           />
         )}
       </div>
+      <LegalCheck isOpen={isLegalCheckOpen} onClose={() => setIsLegalCheckOpen(false)} />
     </div>
   );
 };
