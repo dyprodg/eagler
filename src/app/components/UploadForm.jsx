@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { getSignedURL } from "../actions";
 import { useRouter } from "next/navigation";
+import CheckMark from "./loaders/checkMark";
 
 const UploadForm = () => {
   const { data: session } = useSession();
@@ -13,6 +14,8 @@ const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+
   const router = useRouter();
 
   const buttonDisabled = content.length < 1 || loading;
@@ -72,11 +75,16 @@ const UploadForm = () => {
     setContent("");
     setFile(null);
     //setPreviewUrl(null);
-    router.push("/timeline");
+    setSuccess(true);
+    setTimeout(() => {
+      router.push("/timeline");
+    }, 2000);
   };
 
   return (
     <div className="flex justify-center items-center">
+
+      {success ? <CheckMark /> : 
       <form className="bumpup px-6 py-4 w-[1000px]" onSubmit={handleSubmit}>
       <h1 className="mb-10 text-2xl font-bold text-center"> Create Post</h1>
         {statusMessage && (
@@ -166,6 +174,7 @@ const UploadForm = () => {
           </div>
         </div>
       </form>
+      }
     </div>
   );
 };
