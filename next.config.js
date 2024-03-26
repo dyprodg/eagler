@@ -12,6 +12,13 @@ module.exports = {
         port: "",
         pathname: "/*",
       },
+      {
+        protocol: "https",
+        hostname: "d2eppnsta31d93.cloudfront.net",
+        port: "",
+        pathname: "/*",
+      },
+
     ],
   },
   output: "standalone",

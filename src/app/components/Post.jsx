@@ -4,8 +4,9 @@ import { BiLike } from "react-icons/bi";
 import { FaRegComment } from "react-icons/fa";
 import Image from "next/image";
 import { setLike } from "@/app/actions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CommentModal from "./CommentModal";
+import SpinnerLoader from "./loaders/SpinnerLoader";
 
 function formatTimestamp(timestamp) {
   const now = Date.now();
@@ -29,6 +30,33 @@ export const Post = ({ post, session }) => {
   const [likes, setLikes] = useState(post.likes.length);
   const [myLike, setMyLike] = useState(post.likes.some(like => like.userId === session?.user?.id));
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [imageSrc, setImageSrc] = useState(post.imageUrl);
+  const [imageError, setImageError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    const image = new window.Image();
+    image.src = `${post.imageUrl}?retry=${retryCount}`;
+    image.onload = () => {
+      setIsImageLoading(false);
+      setImageError(false);
+    };
+    image.onerror = () => {
+      setIsImageLoading(true);
+      setImageError(true);
+    };
+  }, [post.imageUrl, retryCount]);
+  
+  useEffect(() => {
+    if (imageError) {
+      const timer = setTimeout(() => {
+        setRetryCount(retryCount + 1);
+      }, 500); 
+  
+      return () => clearTimeout(timer); 
+    }
+  }, [imageError, retryCount]);
 
 
   const handleSetLike = async (postId) => { 
@@ -56,7 +84,7 @@ export const Post = ({ post, session }) => {
         <div className="pb-2 font-semibold">{post.user.username}</div>
         <div className="pb-2 text-gray-400">{formatTimestamp(post.createdAt)}</div>
       </div>
-      <Image src={post.imageUrl} alt={post.id} width={880} height={880} />
+      {imageError ? <SpinnerLoader /> : <img src={imageSrc} alt="Post" />}
       <p className="p-2">{post.content}</p>
       <div className="flex justify-between mt-2">
         <button 
