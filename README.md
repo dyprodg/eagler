@@ -1,8 +1,6 @@
 # EAGLER
 
-This is a full-stack social media app built with Next.js and Terraform, hosted on AWS. This is a student project and the following features will be added soon. The project, called "Eagler", is available through this link.
-
-https://justanothersocialmedia.net
+This is a full-stack social media app built with Next.js and Terraform, hosted on AWS. This is a student project and the following features will be added soon. The project, called "Eagler" is currently not online due to cost of idle servers.
 
 ![Alt text](https://d3nohlcdf7fia8.cloudfront.net/AWS+cloud+diagram+(Community)+(2).png)
 
@@ -21,14 +19,6 @@ https://justanothersocialmedia.net
 - Picture uploading (S3 Bucket AWS)
 - Custom JWT Authentication with PostgreSQL
 - Post liking and commenting
-
-
-## Upcoming Features
-
-- User notifications
-- Chatting
-- Sharing
-- User profiles with follow functionality
 
 ## Installation
 
